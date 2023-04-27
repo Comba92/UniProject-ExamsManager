@@ -1,5 +1,6 @@
-from init import db
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
 
 class Studenti(db.Model):
   idStudente = db.Column(db.Integer, primary_key=True)
