@@ -19,6 +19,13 @@ class Corsi(db.Model):
   annoAccademico = db.Column(db.Integer)
 
 
+class Iscrizione(db.Model):
+  idStudente = db.Column(db.Integer, db.ForeignKey(
+      Studenti.idStudente), primary_key=True)
+  idCorso = db.Column(db.Integer, db.ForeignKey(
+      Corsi.idCorso), primary_key=True)
+
+
 class Insegna(db.Model):
   idDocente = db.Column(db.Integer, db.ForeignKey(
       Docenti.idDocente), primary_key=True)
@@ -26,9 +33,16 @@ class Insegna(db.Model):
       Corsi.idCorso), primary_key=True)
 
 
+class Percorsi(db.Model):
+  idPercorso = db.Column(db.Integer, primary_key=True)
+  proveDaSuperare = db.Column(db.Integer, nullable=False)
+  descrizione = db.Column(db.String)
+
+
 class Prove(db.Model):
   idProva = db.Column(db.Integer, primary_key=True)
   idCorso = db.Column(db.Integer, db.ForeignKey(Corsi.idCorso), nullable=False)
+  idPercorso = db.Column(db.Integer, db.ForeignKey(Percorsi.idPercorso))
   tipologia = db.Column(db.String)
   opzionale = db.Column(db.Boolean)
 
@@ -57,5 +71,4 @@ class Compiti(db.Model):
 
 
 class CompitiValidi(db.Model):
-  idCompito = db.Column(db.Integer, db.ForeignKey(
-      Prove.idProva), nullable=False,  primary_key=True)
+  idCompito = db.Column(db.Integer, db.ForeignKey(Prove.idProva), primary_key=True)
