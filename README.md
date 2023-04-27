@@ -1,8 +1,25 @@
 # Building
 1. pip install pipenv
 2. pipenv shell
-3. flask --app index run
+3. flask --app src/main run
 
 # TODO
 1. Controller per certe query (studentExists, etc...)
-2. 
+2. Trigger per controllo una sola prova valida per appello
+3. Trigger eliminazione prova valida dopo scadenza
+
+4. Rifare schemi, la tabella NonValidi e' inutile e non e' necessaria
+
+# Frontend
+1. Studente:
+  1. Visualizzazione libretto (voti)
+  2. Visualizzaznioe/Iscrizione ad esami
+  3. Visualizzione prenotazioni appelli
+  4. Visualizzazione esiti (prove valide)
+  5. Visualizzazione storico (prove invalide)
+2. Docente:
+  1. Creazione appelli
+  2. Visualizzazione corso/appelli/prove
+  3. Storico presenze appelli
+  4. Assegnazione voti per prova
+  - Anullamento manuale esami (possibile aggiunta)
