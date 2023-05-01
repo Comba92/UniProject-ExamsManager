@@ -1,8 +1,10 @@
 from flask import Flask
 from sqlalchemy import text
+from flask_cors import CORS
 
 def create_app():
   app = Flask(__name__)
+  CORS(app)
   app.logger.debug('Server started.')
 
   app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
@@ -29,7 +31,7 @@ def create_app():
   from .routes.studenti import bp as studenti
   from .routes.appelli import bp as appelli
   from .routes.corsi import bp as corsi
-  from .routes.root import bp as altri
+  from .routes.various import bp as altri
 
   app.register_blueprint(studenti)
   app.register_blueprint(appelli)

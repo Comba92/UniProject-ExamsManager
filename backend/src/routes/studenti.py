@@ -15,10 +15,10 @@ def getStudenti():
 def getProveValideStudente(studente):
   res = db.session.execute(text(
       f"""
-      SELECT * FROM Compiti_Validi
-      JOIN Compiti USING(idCompito)
-      WHERE idStudente = {studente}
-    """
+        SELECT * FROM Compiti_Validi
+        JOIN Compiti USING(idCompito)
+        WHERE idStudente = {studente}
+      """
   ))
   return resultToDict(res)
 
@@ -26,7 +26,7 @@ def getProveValideStudente(studente):
 @bp.get("/<int:studente>/storico/")
 def getStoricoStudente(studente):
   res = db.session.execute(text(
-      f"""
+    f"""
       SELECT * FROM Compiti
       WHERE idStudente = {studente}
     """

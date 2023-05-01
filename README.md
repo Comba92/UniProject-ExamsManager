@@ -7,14 +7,13 @@
 1. Controller per certe query (studentExists, etc...)
 2. Trigger per controllo una sola prova valida per appello
 3. Trigger eliminazione prova valida dopo scadenza
-
-4. Rifare schemi, la tabella NonValidi e' inutile e non e' necessaria
+4. Le view soffrono di SQL injection. Sistemare?
 
 # Frontend
 1. Studente:
   1. Visualizzazione libretto (voti)
-  2. Visualizzaznioe/Iscrizione ad esami
-  3. Visualizzione prenotazioni appelli
+  2. Visualizzazione/Iscrizione ad esami
+  3. Visualizzione/iscrizione appelli
   4. Visualizzazione esiti (prove valide)
   5. Visualizzazione storico (prove invalide)
 2. Docente:
@@ -22,4 +21,4 @@
   2. Visualizzazione corso/appelli/prove
   3. Storico presenze appelli
   4. Assegnazione voti per prova
-  - Anullamento manuale esami (possibile aggiunta)
+    - Anullamento manuale esami (possibile aggiunta)

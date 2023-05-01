@@ -6,12 +6,14 @@ class Studenti(db.Model):
   idStudente = db.Column(db.Integer, primary_key=True)
   nome = db.Column(db.String, nullable=False)
   email = db.Column(db.String)
+  token = db.Column(db.String)
 
 
 class Docenti(db.Model):
   idDocente = db.Column(db.Integer, primary_key=True)
   nome = db.Column(db.String, nullable=False)
   email = db.Column(db.String)
+  token = db.Column(db.String)
 
 
 class Corsi(db.Model):
