@@ -29,17 +29,17 @@ def create_app():
     db.session.commit()
     app.logger.debug('Database populated.')
 
-  from .routes.studenti import bp as studenti
-  from .routes.docenti import bp as docenti
-  from .routes.appelli import bp as appelli
-  from .routes.corsi import bp as corsi
+  from .routes.students import bp as students
+  from .routes.teachers import bp as teachers
+  from .routes.exams import bp as exams
+  from .routes.courses import bp as courses
   from .routes.views import bp as views
   from .routes.login import bp as login
 
-  app.register_blueprint(studenti)
-  app.register_blueprint(docenti)
-  app.register_blueprint(appelli)
-  app.register_blueprint(corsi)
+  app.register_blueprint(students)
+  app.register_blueprint(teachers)
+  app.register_blueprint(exams)
+  app.register_blueprint(courses)
   app.register_blueprint(views)
   app.register_blueprint(login)
 

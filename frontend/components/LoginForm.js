@@ -9,15 +9,15 @@ export default function LoginForm({ login }) {
   
   async function handleLogin(event) {
     event.preventDefault()
-    console.log(window.localStorage.getItem("loggedUser"))
     setError(null)
+
     const formData = new FormData(event.target)
     try {
       const req = await axios.post(`${API_URL}/login`, {
         username: formData.get("username"),
         type: formData.get("type")
       })
-      const user = req.data.results[0]
+      const user = req.data.query[0]
       user.type = formData.get("type")
       
       login(user)

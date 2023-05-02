@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 class SerializableModel(db.Model):
   __abstract__ = True
   @property
@@ -9,86 +10,86 @@ class SerializableModel(db.Model):
     return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
-class Utenti(SerializableModel):
+class Users(SerializableModel):
   username = db.Column(db.String)
   password = db.Column(db.String)
-  idUtente = db.Column(db.Integer, primary_key=True)
+  idUser = db.Column(db.Integer, primary_key=True)
   
 
-class Studenti(SerializableModel):
-  idStudente = db.Column(db.Integer, primary_key=True)
-  idUtente = db.Column(db.Integer, db.ForeignKey(Utenti.idUtente))
-  nome = db.Column(db.String, nullable=False)
+class Students(SerializableModel):
+  idStudent = db.Column(db.Integer, db.ForeignKey(Users.idUser), primary_key=True)
+  name = db.Column(db.String, nullable=False)
   email = db.Column(db.String)
 
 
-class Docenti(SerializableModel):
-  idDocente = db.Column(db.Integer, primary_key=True)
-  idUtente = db.Column(db.Integer, db.ForeignKey(Utenti.idUtente))
-  nome = db.Column(db.String, nullable=False)
+class Teachers(SerializableModel):
+  idTeacher = db.Column(db.Integer, db.ForeignKey(Users.idUser), primary_key=True)
+  name = db.Column(db.String, nullable=False)
   email = db.Column(db.String)
 
 
-class Corsi(SerializableModel):
-  idCorso = db.Column(db.Integer, primary_key=True)
-  titolo = db.Column(db.String, nullable=False)
-  descrizione = db.Column(db.String)
-  annoAccademico = db.Column(db.Integer)
+class Courses(SerializableModel):
+  idCourse = db.Column(db.Integer, primary_key=True)
+  title = db.Column(db.String, nullable=False)
+  description = db.Column(db.String)
+  academicYear = db.Column(db.Integer)
 
 
-class Iscrizione(SerializableModel):
-  idStudente = db.Column(db.Integer, db.ForeignKey(
-      Studenti.idStudente), primary_key=True)
-  idCorso = db.Column(db.Integer, db.ForeignKey(
-      Corsi.idCorso), primary_key=True)
-  votoFinale = db.Column(db.Integer)
+class Subscriptions(SerializableModel):
+  idStudent = db.Column(db.Integer, db.ForeignKey(
+      Students.idStudent), primary_key=True)
+  idCourse = db.Column(db.Integer, db.ForeignKey(
+      Courses.idCourse), primary_key=True)
+  finalMark = db.Column(db.Integer)
 
 
-class Insegna(SerializableModel):
-  idDocente = db.Column(db.Integer, db.ForeignKey(
-      Docenti.idDocente), primary_key=True)
-  idCorso = db.Column(db.Integer, db.ForeignKey(
-      Corsi.idCorso), primary_key=True)
-  ruolo = db.Column(db.String)
+class Teaches(SerializableModel):
+  idTeacher = db.Column(db.Integer, db.ForeignKey(
+      Teachers.idTeacher), primary_key=True)
+  idCourse = db.Column(db.Integer, db.ForeignKey(
+      Courses.idCourse), primary_key=True)
+  role = db.Column(db.String)
 
 
-class Percorsi(SerializableModel):
-  idPercorso = db.Column(db.Integer, primary_key=True)
-  proveDaSuperare = db.Column(db.Integer, nullable=False)
-  descrizione = db.Column(db.String)
+class ExamPaths(SerializableModel):
+  idPath = db.Column(db.Integer, primary_key=True)
+  testsToPass = db.Column(db.Integer, nullable=False)
+  description = db.Column(db.String)
 
 
-class Prove(SerializableModel):
-  idProva = db.Column(db.Integer, primary_key=True)
-  idCorso = db.Column(db.Integer, db.ForeignKey(Corsi.idCorso), nullable=False)
-  idPercorso = db.Column(db.Integer, db.ForeignKey(Percorsi.idPercorso))
-  tipologia = db.Column(db.String)
-  descrizione = db.Column(db.String)
-  opzionale = db.Column(db.Boolean)
+# Prove
+class Tests(SerializableModel):
+  idTest = db.Column(db.Integer, primary_key=True)
+  idCourse = db.Column(db.Integer, db.ForeignKey(Courses.idCourse), nullable=False)
+  idExamPath = db.Column(db.Integer, db.ForeignKey(ExamPaths.idPath))
+  type = db.Column(db.String)
+  description = db.Column(db.String)
+  optional = db.Column(db.Boolean)
+  weight = db.Column(db.Integer)
 
 
-class Organizza(SerializableModel):
-  idDocente = db.Column(db.Integer, db.ForeignKey(
-      Docenti.idDocente), primary_key=True)
-  idProva = db.Column(db.Integer, db.ForeignKey(
-      Prove.idProva), primary_key=True)
+class Organizes(SerializableModel):
+  idTeacher = db.Column(db.Integer, db.ForeignKey(
+      Teachers.idTeacher), primary_key=True)
+  idTest = db.Column(db.Integer, db.ForeignKey(
+      Tests.idTest), primary_key=True)
 
 
-class Appelli(SerializableModel):
-  idAppello = db.Column(db.Integer, primary_key=True)
-  idProva = db.Column(db.Integer, db.ForeignKey(Prove.idProva), nullable=False)
-  dataEsame = db.Column(db.Date)
-  dataScadenza = db.Column(db.Date)
+# Appelli
+class Exams(SerializableModel):
+  idExam = db.Column(db.Integer, primary_key=True)
+  idTest = db.Column(db.Integer, db.ForeignKey(Tests.idTest), nullable=False)
+  date = db.Column(db.Date)
+  expiryDate = db.Column(db.Date)
 
 
-class Compiti(SerializableModel):
-  idCompito = db.Column(db.Integer, primary_key=True)
-  idAppello = db.Column(db.Integer, db.ForeignKey(
-      Appelli.idAppello), nullable=False)
-  idStudente = db.Column(db.Integer, db.ForeignKey(
-      Studenti.idStudente), nullable=False)
-  voto = db.Column(db.Integer)
-
-
-class CompitiValidi(SerializableModel):
-  idCompito = db.Column(db.Integer, db.ForeignKey(Prove.idProva), primary_key=True)
+# Compito
+class Sittings(SerializableModel):
+  idSitting = db.Column(db.Integer, primary_key=True)
+  idExam = db.Column(db.Integer, db.ForeignKey(
+      Exams.idExam), nullable=False)
+  idStudent = db.Column(db.Integer, db.ForeignKey(
+      Students.idStudent), nullable=False)
+  mark = db.Column(db.Integer)
+  accepted = db.Column(db.Boolean)
+  valid = db.Column(db.Boolean)

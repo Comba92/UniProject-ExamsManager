@@ -11,8 +11,8 @@ def hello_world():
   return "<p>Hello World!</p>"
 
 
-@bp.route("/prove/")
-def getProve():
+@bp.route("/sittings/")
+def getAllSittings():
   res = db.session.execute(text("SELECT * FROM PROVE"))
   return resultToDict(res)
 
