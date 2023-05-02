@@ -1,5 +1,11 @@
-INSERT INTO Studenti (nome)
-VALUES ('marco'), ('giulio'), ('andrea');
+INSERT INTO Utenti (username)
+VALUES ('88001'), ('88002'), ('88003'), ('99001');
+
+INSERT INTO Studenti (nome, idUtente)
+VALUES ('marco', 1), ('giulio', 2), ('andrea', 3);
+
+INSERT INTO Docenti (nome, idUtente)
+VALUES ('prof', 4);
 
 INSERT INTO Corsi (titolo)
 VALUES ('informatica'), ('matematica'), ('statistica');

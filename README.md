@@ -1,7 +1,10 @@
-# Building
+# Building Backend (da sistemare metodo building)
 1. pip install pipenv
 2. pipenv shell
 3. flask --app src/main run
+
+# Building Frontend
+1. npm run dev
 
 # TODO
 1. Controller per certe query (studentExists, etc...)

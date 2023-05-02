@@ -8,6 +8,7 @@ def create_app():
   app.logger.debug('Server started.')
 
   app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
+  app.config["SECRET_KEY"] = "bdd2023"
 
   from .models import db
   db.init_app(app)
@@ -29,14 +30,18 @@ def create_app():
     app.logger.debug('Database populated.')
 
   from .routes.studenti import bp as studenti
+  from .routes.docenti import bp as docenti
   from .routes.appelli import bp as appelli
   from .routes.corsi import bp as corsi
-  from .routes.various import bp as altri
+  from .routes.views import bp as views
+  from .routes.login import bp as login
 
   app.register_blueprint(studenti)
+  app.register_blueprint(docenti)
   app.register_blueprint(appelli)
   app.register_blueprint(corsi)
-  app.register_blueprint(altri)
+  app.register_blueprint(views)
+  app.register_blueprint(login)
 
   app.logger.debug('Routes built.')
 
