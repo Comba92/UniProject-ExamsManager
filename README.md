@@ -23,3 +23,12 @@
   3. Storico presenze appelli
   4. Assegnazione voti per prova
   - Anullamento manuale esami (possibile aggiunta)
+
+# Environment
+https://datascience.stackexchange.com/questions/24093/how-to-clone-python-working-environment-on-another-machine
+
+```python
+conda env export > environment.yml
+
+conda env create -f environment.yml
+```

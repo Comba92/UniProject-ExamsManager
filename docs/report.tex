@@ -1,0 +1,39 @@
+\documentclass{book}
+
+% Choose a conveniently small page size
+\usepackage[paperheight = 16cm, paperwidth = 12cm, textwidth = 10cm]{ geometry }
+\usepackage[english, main = italian]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\usepackage[parfill]{parskip}
+\usepackage[linewidth=1pt]{mdframed}
+\usepackage{graphicx}
+
+\graphicspath{ {./images/} }
+
+\newmdtheoremenv{example}{Esempio}{\itshape}{\itshape}
+\newtheorem{remark}{Osservazione}[section]
+
+\title{Report - Basi di Dati Mod.2 (Progetto)}
+\author{Ivan Spinello, Gianmaria Pizzo, Florian Sabani}
+\date{Giugno 2023}
+\begin{document}
+
+\frontmatter
+\maketitle
+$$ \textbf{Prefazione} $$
+
+Progetto Basi di dati
+
+\mainmatter
+\tableofcontents
+    \input{chapters/introduzione.tex}
+    \input{chapters/funzionalita_principali.tex}
+    \input{chapters/progettazione_concettuale_logica.tex}
+    \input{chapters/query_principali.tex}
+    \input{chapters/principali_scelte_progettuali.tex}
+    \input{chapters/ulteriori_informazioni.tex}
+    \input{chapters/contributi.tex}
+\end{document}
