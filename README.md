@@ -32,3 +32,9 @@ conda env export > environment.yml
 
 conda env create -f environment.yml
 ```
+
+# Supabase
+
+If supabase fails to connect 
+
+https://github.com/supabase/supabase/issues/7938
