@@ -136,7 +136,7 @@ class Config:
     """
     Base configuration for the Flask Application. It includes Engine configurations for SQLAlchemy object.
     """
-    add_valid_user("POSTGRES", "SUPA_PASSWORD")
+    add_valid_user("USER", "PASSWORD")
     # add more valid users here
     VALID_USERS_lst = list(VALID_USERS.keys())
 

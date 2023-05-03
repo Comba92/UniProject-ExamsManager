@@ -38,3 +38,15 @@ conda env create -f environment.yml
 If supabase fails to connect 
 
 https://github.com/supabase/supabase/issues/7938
+
+# Routes
+* UniExamHandler.com/
+  * Login
+  * Register
+  * Home
+  * Profile
+  * Statistics
+  * Exams Subscription (student)
+  * Reservations (student)
+  * 
+

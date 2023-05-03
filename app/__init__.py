@@ -22,6 +22,6 @@ def init_app():
         # TODO: drop data only for testing
         print(db.get_engine())
         db.metadata.drop_all(db.get_engine(), checkfirst=True)
-        # db.metadata.create_all(db.get_engine(), checkfirst=True)
+        db.metadata.create_all(db.get_engine(), checkfirst=True)
         # insert_dummy_data(db)
     return app
