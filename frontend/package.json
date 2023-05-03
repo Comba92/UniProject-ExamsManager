@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "server": "cd ../backend && flask --app src run --debug",
     "build": "next build",
     "start": "next start"
   },

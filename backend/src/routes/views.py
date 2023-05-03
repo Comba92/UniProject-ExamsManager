@@ -1,8 +1,6 @@
 from ..utils import *
-from ..models import db
-from flask import Blueprint
-from sqlalchemy import text
 from ..models import *
+from flask import Blueprint
 
 bp = Blueprint('views', __name__)
 
@@ -13,25 +11,12 @@ def hello_world():
 
 @bp.route("/sittings/")
 def getAllSittings():
-  res = db.session.execute(text("SELECT * FROM PROVE"))
-  return resultToDict(res)
+  res = db.session.query(Sittings)
+  return {"query": simpleQueryToList(res)}
 
 
 @bp.route("/utenti/")
 def getUtenti():
-  res = db.session.execute(text("SELECT * FROM UTENTI"))
-  return resultToDict(res)
-
-
-@bp.route("/testing")
-def testing():
-  res = db.session.execute(db.select(Utenti.username, Studenti.nome).join(Utenti).filter_by(username=88001)).all()
-  for row in res:
-    print(row._mapping)
-  
-  res = db.session.query(Utenti).all()
-  for row in res:
-    print(row.to_dict)
-
-  return ''
+  res = db.session.query(Users)
+  return {"query": simpleQueryToList(res)}
 

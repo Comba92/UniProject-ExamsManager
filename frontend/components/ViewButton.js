@@ -3,18 +3,19 @@ import { useState } from 'react'
 import ResultsView from './ResultsView'
 import ErrorMessage from './ErrorMessage'
 
-export default function ViewButton({ title, APIRoute, actions, setView }) {
+export default function ViewButton({ view, setView }) {
   async function getView() {
     try {
-      const req = await axios.get(APIRoute)
-      const res = req.data.results
-      setView(<ResultsView list={res} title={title} actions={actions}/>)
+      const req = await axios.get(view.route)
+      const res = req.data.query
+      if(res.length == 0) throw new Error('Nessun risultato!')
+      setView(<ResultsView list={res} view={view}/>)
     } catch(e) { 
       setView(<ErrorMessage error={e.message} />) 
     }
   }
 
   return (
-    <button onClick={getView}>{title}</button>
+    <button onClick={getView}>{view.title}</button>
   )
 }

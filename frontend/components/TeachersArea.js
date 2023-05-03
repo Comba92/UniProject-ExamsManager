@@ -13,7 +13,7 @@ export default function StudentsArea({ user, logout }) {
 
   return (
     <div>
-      <h1>Benvenuto nell'area personale, {user.nome}!</h1>
+      <h1>Benvenuto nell'area personale, {user.name}!</h1>
       <p><button onClick={resetSession}>Logout</button></p>
       {
         views.map(v =>

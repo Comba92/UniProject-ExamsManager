@@ -1,6 +1,6 @@
 from ..utils import *
 from ..models import *
-from flask import Blueprint
+from flask import Blueprint, request
 
 bp = Blueprint('students', __name__, url_prefix='/students')
 
@@ -24,6 +24,28 @@ def getSubscribedCourses(student):
   ).all()
 
   return {"query": complexQueryToList(res)}
+
+@bp.post("/<int:student>/unsubscribe")
+def unsubscribeFromCourse(student):
+  req = request.get_json()
+
+  isSubscribedTo = (
+    db.select(Subscriptions.idCourse)
+      .where(Subscriptions.idStudent == student, Subscriptions.idCourse == req['idCourse'])
+  )
+
+  db.first_or_404(isSubscribedTo)
+
+  db.session.execute(
+    db.delete(Subscriptions)
+      .where(Subscriptions.idCourse.in_(isSubscribedTo))
+  )
+
+  try:
+    db.session.commit()
+    return {"status": "success"}
+  except:
+    return {"status": "error"}
 
 
 @bp.get("/<int:student>/results/")

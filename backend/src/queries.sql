@@ -10,6 +10,9 @@ VALUES ('prof', 4);
 INSERT INTO Courses (title)
 VALUES ('informatica'), ('matematica'), ('statistica');
 
+INSERT INTO Subscriptions (idCourse, idStudent)
+VALUES (1, 1), (1, 2), (2, 2), (2, 3), (3, 1)
+
 INSERT INTO Exam_Paths (testsToPass)
 VALUES (3), (2), (1), (2), (1);
 
