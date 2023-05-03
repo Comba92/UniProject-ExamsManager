@@ -12,16 +12,16 @@
 3. Trigger eliminazione prova valida dopo scadenza
 4. Le view soffrono di SQL injection. Sistemare?
 
-# Frontend
+# Viste / Servizi
 1. Studente:
-  1. Visualizzazione libretto (voti)
-  2. Visualizzazione/Iscrizione ad esami
-  3. Visualizzione/iscrizione appelli
-  4. Visualizzazione esiti (prove valide)
-  5. Visualizzazione storico (prove invalide)
+  1. ~~Visualizzazione libretto (voti)~~ QUERY NEEDS TESTING
+  2. ~~Visualizzazione/Iscrizione a corsi~~
+  3. ~~Visualizzione/iscrizione appelli~~
+  4. ~~Visualizzazione esiti (prove valide)~~
+  5. ~~Visualizzazione storico (prove invalide)~~
 2. Docente:
-  1. Creazione appelli
-  2. Visualizzazione corso/appelli/prove
-  3. Storico presenze appelli
+  1. ~~Creazione appelli~~
+  2. ~~Visualizzazione corso/appelli/prove~~
+  3. ~~Storico presenze appelli~~
   4. Assegnazione voti per prova
     - Anullamento manuale esami (possibile aggiunta)

@@ -83,6 +83,12 @@ class Exams(SerializableModel):
   expiryDate = db.Column(db.Date)
 
 
+class Reservations(SerializableModel):
+  idStudent = db.Column(db.Integer, db.ForeignKey(
+      Students.idStudent), primary_key=True)
+  idExam = db.Column(db.Integer, db.ForeignKey(
+      Exams.idExam), primary_key=True)
+
 # Compito
 class Sittings(SerializableModel):
   idSitting = db.Column(db.Integer, primary_key=True)

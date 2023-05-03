@@ -1,6 +1,6 @@
 from ..utils import *
 from ..models import *
-from flask import Blueprint
+from flask import Blueprint, request
 from sqlalchemy import func
 
 bp = Blueprint('courses', __name__, url_prefix='/courses')
@@ -19,6 +19,19 @@ def getCourseTests(course):
       .where(Courses.idCourse==course)
   )
   return {"query": complexQueryToList(res)}
+
+
+@bp.post("/<int:course>/subscribe")
+def subscribeToCourse(course):
+  req = request.get_json()
+  newSubscription = Subscriptions(
+    idStudent = req['idStudent'],
+    idCourse = course
+  )
+  res = db.session.add(newSubscription)
+
+  db.session.commit()
+  return {"stats": "success"}
 
 
 @bp.get("/<int:course>/passed")

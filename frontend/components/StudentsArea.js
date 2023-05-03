@@ -23,7 +23,7 @@ export default function StudentsArea({ user, logout }) {
     },
     {
       title: 'Visualizza Esiti',
-      route: `${API_URL}/students/${user.idStudent}/results`,
+      route: `${API_URL}/students/${user.idStudent}/valids`,
       actions: []
     },
     {

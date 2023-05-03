@@ -1,6 +1,7 @@
 from ..utils import *
 from ..models import *
 from flask import Blueprint, request
+from sqlalchemy import func
 
 bp = Blueprint('students', __name__, url_prefix='/students')
 
@@ -14,6 +15,7 @@ def getStudentData(student):
   res = db.session.query(Students).filter_by(idStudent=student).one()
   return {"query": res.to_dict}
 
+
 @bp.get("/<int:student>/courses/")
 def getSubscribedCourses(student):
   res = db.session.execute(
@@ -25,7 +27,8 @@ def getSubscribedCourses(student):
 
   return {"query": complexQueryToList(res)}
 
-@bp.post("/<int:student>/unsubscribe")
+
+@bp.delete("/<int:student>/unsubscribe")
 def unsubscribeFromCourse(student):
   req = request.get_json()
 
@@ -36,19 +39,36 @@ def unsubscribeFromCourse(student):
 
   db.first_or_404(isSubscribedTo)
 
-  db.session.execute(
+  res = db.session.execute(
     db.delete(Subscriptions)
       .where(Subscriptions.idCourse.in_(isSubscribedTo))
   )
 
-  try:
-    db.session.commit()
-    return {"status": "success"}
-  except:
-    return {"status": "error"}
+  db.session.commit()
+  return {"status": "success"}
 
 
-@bp.get("/<int:student>/results/")
+@bp.delete("/<int:student>/unreserve")
+def unsubscribeFromCourse(student):
+  req = request.get_json()
+
+  isReservedTo = (
+      db.select(Reservations.idExam)
+      .where(Subscriptions.idStudent == student, Reservations.idExam == req['idExam'])
+  )
+
+  db.first_or_404(isReservedTo)
+
+  res = db.session.execute(
+      db.delete(Reservations)
+      .where(Reservations.idExam.in_(isReservedTo))
+  )
+
+  db.session.commit()
+  return {"status": "success"}
+
+
+@bp.get("/<int:student>/valids/")
 def getExamsResults(student):
   res = db.session.execute(
     db.select(Sittings)
@@ -67,4 +87,31 @@ def getExamsHistory(student):
       .where(Sittings.idStudent == student)
   ).all()
   
+  return {"query": complexQueryToList(res)}
+
+
+@bp.get("/<int:student>/marks/")
+def getStudentMarks(student):
+  res = db.session.execute(
+    db.select(Subscriptions)
+      .join(Students)
+      .where(Students.idStudent==student)
+  ).all()
+
+  return {"query": complexQueryToList(res)}
+
+
+# The hard one
+@bp.get("/<int:student>/results/")
+def getStudentMarksToAccept(student):
+  res = db.session.execute(
+    db.select(Sittings)
+      .join(Students)
+      .join(Exams)
+      .join(Tests)
+      .where(Students.idStudent==student, Sittings.valid==True)
+      .group_by(Students.idStudent, Tests.idExamPath)
+      .having(func.sum(Sittings.mark * (Tests.weight/100)) >= 100)
+  ).all()
+
   return {"query": complexQueryToList(res)}

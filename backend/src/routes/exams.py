@@ -1,6 +1,6 @@
 from ..utils import *
 from ..models import *
-from flask import Blueprint
+from flask import Blueprint, request
 
 bp = Blueprint('exams', __name__, url_prefix='/exams')
 
@@ -8,6 +8,19 @@ bp = Blueprint('exams', __name__, url_prefix='/exams')
 def getExams():
   res = db.session.query(Exams)
   return {"query": simpleQueryToList(res)}
+
+
+@bp.post("/<int:exam>/reserve")
+def reserveExam(exam):
+  req = request.get_json()
+  newSubscription = Reservations(
+      idStudent=req['idStudent'],
+      idCourse=exam
+  )
+  res = db.session.add(newSubscription)
+
+  db.session.commit()
+  return {"stats": "success"}
 
 
 @bp.get("/<int:appello>/accepted")
