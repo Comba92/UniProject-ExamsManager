@@ -55,24 +55,12 @@ def getCoursesExamStudents(teacher, exam):
   return {"query": complexQueryToList(res)}
 
 
-@bp.get("/<int:student>/tests/")
-def getCoursesTests(student):
-  res = db.session.execute(
-      db.select(Tests)
-      .join(Courses)
-      .join(Teachers)
-      .where(Students.idStudent == student)
-  ).all()
-
-  return {"query": complexQueryToList(res)}
-
-
 @bp.post("/<int:teacher>/createExam/")
 def createExam(teacher):
   req = request.get_json()
   newExam = Exams(
-      idTest=req['idTest']
-      date=req['date']
+      idTest=req['idTest'],
+      date=req['date'],
       expiryDate=['expiryDate']
   )
   db.session.add(newExam)

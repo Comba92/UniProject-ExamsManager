@@ -49,7 +49,7 @@ def unsubscribeFromCourse(student):
 
 
 @bp.delete("/<int:student>/unreserve")
-def unsubscribeFromCourse(student):
+def unreserverExam(student):
   req = request.get_json()
 
   isReservedTo = (
