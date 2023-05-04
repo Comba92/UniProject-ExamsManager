@@ -1,5 +1,5 @@
 """
-Flask-SQLAlchemy Styled Data Models
+Flask-SQLAlchemy Imperative-Mapping-Styled Database Models
 
 These classes represent the closest abstraction to the real database,
 they do not implement any kind of security, any control
@@ -8,7 +8,6 @@ should be made by the relative provider class before creating new instances.
 """
 
 import datetime
-import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from sqlalchemy_utils import create_view
@@ -42,6 +41,12 @@ class Reserves(db.Model):
 
 # Program <<-- Includes -->> Course
 class Includes(db.Model):
+    """
+    Association Table for the courses belonging to a program. A course might be included in multiple programs, and
+    programs have many courses.
+
+    """
+
     __tablename__ = 'includes'
 
     program_id = db.Column(db.Integer, db.ForeignKey('program.id', ondelete="CASCADE"),
@@ -51,8 +56,16 @@ class Includes(db.Model):
     pass
 
 
-# Course <<-- PassedBy -->> Students
+# Student <<-- Follows -->> Course
 class Follows(db.Model):
+    """
+    Association Table for the courses followed by the students. The student may follow different course (even courses
+    that are not strictly related to the programs they follow) and if they pass the course, their final grade is
+    memorized when the conditions for final evaluation are met (valid, not expired...).
+
+
+    """
+
     __tablename__ = 'follows'
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"),
@@ -64,8 +77,14 @@ class Follows(db.Model):
     pass
 
 
-# Student <-- GraduatesFrom --> Program
+# Student <-- Subscribes --> Program
 class Subscribes(db.Model):
+    """
+    Association Table for the students' programs. A student may be subscribed to multiple programs as long as
+    only one program has no final grade and no registry date. When a student graduates, the final grade is registered.
+
+    """
+
     __tablename__ = 'subscribes'
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"),
@@ -73,7 +92,7 @@ class Subscribes(db.Model):
     program_id = db.Column(db.Integer, db.ForeignKey('program.id', ondelete="CASCADE"),
                            primary_key=True)
     final_grade = db.Column(db.Integer, nullable=True)
-    registry_date = db.Column(db.DateTime, nullable=True, default=datetime.datetime.utcnow())
+    registry_date = db.Column(db.DateTime, nullable=True)
     pass
 
 
@@ -97,18 +116,10 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String, nullable=False)
     first_name = db.Column(db.String(128), nullable=False, default="Unknown")
     last_name = db.Column(db.String(128), nullable=False, default="Unknown")
-    gender = db.Column(db.String, nullable=True, default="Unknown")
     birth_day = db.Column(db.DateTime, nullable=False)
-    birth_city = db.Column(db.String(128), nullable=False)
-    birth_province = db.Column(db.String(128), nullable=False)
-    birth_country = db.Column(db.String(128), nullable=False)
+    birth_address = db.Column(db.String, nullable=False)
     social_security_number = db.Column(db.String(128), nullable=False)
-    country = db.Column(db.String(128), nullable=False)
-    province = db.Column(db.String(128), nullable=False)
-    city = db.Column(db.String(128), nullable=False)
-    zip_code = db.Column(db.String(128), nullable=False)
-    address = db.Column(db.String(128), nullable=False)
-    house_number = db.Column(db.Integer, nullable=False)
+    address = db.Column(db.String, nullable=False)
     phone_number = db.Column(db.String(128), unique=True, nullable=False)
     member_since = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
     last_update = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
@@ -140,8 +151,9 @@ class User(db.Model, UserMixin):
                                    cascade='all, delete')
     # User(Student) <-- Accepts -->> Assessment
     assessments = db.relationship("Assessment", back_populates="student")
-
+    
     pass
+
 
 
 class Program(db.Model):
@@ -364,11 +376,14 @@ class Assessment(db.Model):
     # Assessment <<-- AcceptedBy --> Student (If the reservation was made)
     student_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"))
     student = db.relationship("User", back_populates="assessments")
+    
+    def __init__(self, grade: int, valid: bool, ):
+        
+        pass
+    
     pass
 
-    # TODO: Fix how we can connect the assessment to the reservation, so that we know a student was
-    #  evaluated because they
-    # had a reservation
+    
 
 # Views ------------------------------------------------------
 
