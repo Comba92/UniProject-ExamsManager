@@ -1,20 +1,19 @@
 import ViewButton from "./ViewButton";
 import { useState, useEffect } from "react"
-import { API_URL } from "../config";
-import axios from "axios";
+import {client} from '../config'
 
 export default function StudentsArea({ user, logout }) {
   const [currentView, setView] = useState(null)
   const views = [
     {
       title: "Iscrizione Corsi",
-      route: `${API_URL}/students/${user.idStudent}/courses`,
+      route: `/students/${user.idStudent}/courses`,
       actions: [
         {
           title: 'discriviti',
           execute: async (entry) => {
             try {
-              await axios.post(`${API_URL}/students/${user.idStudent}/unsubscribe`, {
+              await client.post(`/students/${user.idStudent}/unsubscribe`, {
                 idCourse: entry.idCourse
               })
             } catch (e) { console.log(e) }
@@ -23,12 +22,12 @@ export default function StudentsArea({ user, logout }) {
     },
     {
       title: 'Visualizza Esiti',
-      route: `${API_URL}/students/${user.idStudent}/valids`,
+      route: `/students/${user.idStudent}/valids`,
       actions: []
     },
     {
       title: 'Visualliza Storico',
-      route: `${API_URL}/students/${user.idStudent}/history`,
+      route: `/students/${user.idStudent}/history`,
       actions: []
     },
   ]

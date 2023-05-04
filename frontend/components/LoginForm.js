@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { API_URL } from '../config.js'
+import { client } from '../config.js'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -13,18 +13,18 @@ export default function LoginForm({ login }) {
 
     const formData = new FormData(event.target)
     try {
-      const req = await axios.post(`${API_URL}/login`, {
+      const req = await client.post(`/login`, {
         username: formData.get("username"),
         type: formData.get("type")
       })
       // login returns just one result 
-      const user = req.data.query
+      const user = await req.data.query
       user.type = formData.get("type")
       
       login(user)
       window.localStorage.setItem("loggedUser", JSON.stringify(user))
     } catch (e) {
-      setError(e.message + ', ' + e.response.data.error)
+      setError(e.message)
     }
   }
 

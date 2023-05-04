@@ -1,7 +1,6 @@
 import EntryView from "./EntryView"
-import { useState } from 'react'
 
-export default function ResultsView({ list, view }) {
+export default function ResultsView({ list, view, setView }) {
   return (
     <div>
       <h1>{view.title}</h1>
@@ -10,7 +9,7 @@ export default function ResultsView({ list, view }) {
             <div>
               <EntryView entry={e} />
               { view.actions.map(a => 
-                <button onClick={async () => { await a.execute(e); }}>
+                <button onClick={async () => { await a.execute(e); await setView() }}>
                   {a.title}
                 </button>)
               }
