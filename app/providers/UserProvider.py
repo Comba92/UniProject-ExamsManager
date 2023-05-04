@@ -1,8 +1,4 @@
-
-
-
 class UserProvider:
-
     pass
 
 
@@ -15,4 +11,8 @@ class ProfessorProvider(UserProvider):
 
 
 class StudentProvider(UserProvider):
+
+    def get_
+
+
     pass
