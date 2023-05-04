@@ -50,3 +50,14 @@ https://github.com/supabase/supabase/issues/7938
   * Reservations (student)
   * 
 
+# Environment 
+
+# Conda
+
+# Poetry
+C:\Users\PayThePizzo\AppData\Roaming\Python\Scripts\poetry
+
+# Weak points
+* Security - Login
+* SQL Injection
+* Timezone absent in dates

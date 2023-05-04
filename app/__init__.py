@@ -19,9 +19,15 @@ def init_app():
         ## Blueprints ---------------------
 
         ## DB -----------------------------
-        # TODO: drop data only for testing
+
+        # Check that db is properly initialized
+        
+
+        # Else, recreate it all
         print(db.get_engine())
-        db.metadata.drop_all(db.get_engine(), checkfirst=True)
-        db.metadata.create_all(db.get_engine(), checkfirst=True)
-        # insert_dummy_data(db)
+        # db.metadata.drop_all(db.get_engine(), checkfirst=True)
+        # db.metadata.create_all(db.get_engine(), checkfirst=True)
+        # Insert dummy data
+        # Start
+
     return app
