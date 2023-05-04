@@ -127,10 +127,10 @@ class User(db.Model, UserMixin):
 
     # Relationships
     # User(Board) <-- Manages -->> Program
-    programs_created = db.relationship("Programs", back_populates="board")
+    programs_created = db.relationship("Program", back_populates="board")
     # Student <<-- Subscribes -->> Program (More if they have graduated)
-    programs = db.relationship('Subscribes', foreign_keys=[Subscribes.program_id],
-                               back_populates="students",
+    programs = db.relationship(argument="Subscribes",
+                               foreign_keys=[Subscribes.user_id],
                                lazy='dynamic',
                                cascade='all, delete')
     # User(Board) <-- Creates -->> Courses
@@ -200,12 +200,11 @@ class Program(db.Model):
     board = db.relationship("User", back_populates="programs_created")
     # Program <<-- Includes -->> Course (Association Table)
     courses = db.relationship('Includes', foreign_keys=[Includes.course_id],
-                              back_populates="programs",
                               lazy='dynamic',
                               cascade='all, delete')
     # Student <<-- Subscribes -->> Program (More if they have graduated)
-    students = db.relationship('Subscribes', foreign_keys=[Subscribes.user_id],
-                               back_populates="programs",
+    students = db.relationship(argument="Subscribes",
+                               foreign_keys=[Subscribes.program_id],
                                lazy='dynamic',
                                cascade='all, delete')
     pass
