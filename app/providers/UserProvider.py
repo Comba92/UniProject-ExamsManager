@@ -1,4 +1,9 @@
+from .data.models import User
+
+
 class UserProvider:
+
+    def __init__(self, data):
     pass
 
 
@@ -11,8 +16,4 @@ class ProfessorProvider(UserProvider):
 
 
 class StudentProvider(UserProvider):
-
-    def get_
-
-
     pass

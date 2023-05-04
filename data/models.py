@@ -112,7 +112,6 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement="auto")
     role = db.Column(db.String(128), unique=False, nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
-    username = db.Column(db.String(128), unique=True, nullable=False)
     password_hash = db.Column(db.String, nullable=False)
     first_name = db.Column(db.String(128), nullable=False, default="Unknown")
     last_name = db.Column(db.String(128), nullable=False, default="Unknown")
@@ -152,8 +151,23 @@ class User(db.Model, UserMixin):
     # User(Student) <-- Accepts -->> Assessment
     assessments = db.relationship("Assessment", back_populates="student")
     
+    def __init__(self, data):
+        role = data.get('role')
+        email = data.get('email')
+        password_hash = data.get('password_hash')
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        birth_day = data.get('birth_day')
+        birth_address = data.get('birth_address')
+        social_security_number = data.get('ssn')
+        address = data.get('address')
+        phone_number = data.get('phone_number')
+        member_since = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
+        last_update = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
+        last_login = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
+        pass
+    
     pass
-
 
 
 class Program(db.Model):
@@ -376,14 +390,11 @@ class Assessment(db.Model):
     # Assessment <<-- AcceptedBy --> Student (If the reservation was made)
     student_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"))
     student = db.relationship("User", back_populates="assessments")
-    
-    def __init__(self, grade: int, valid: bool, ):
-        
-        pass
-    
-    pass
 
-    
+    def __init__(self, grade: int, valid: bool, ):
+        pass
+
+    pass
 
 # Views ------------------------------------------------------
 

@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_login import LoginManager
+from flask_bcrypt import Bcrypt
 from data.models import db
+from data.startup import insert_dummy_data
 
 login_manager = LoginManager()
 
@@ -14,6 +16,7 @@ def init_app():
     # Initialize plugins
     db.init_app(app)
     login_manager.init_app(app)
+    Bcrypt(app)
 
     with app.app_context():
         ## Blueprints ---------------------
@@ -24,10 +27,9 @@ def init_app():
         
 
         # Else, recreate it all
-        print(db.get_engine())
-        # db.metadata.drop_all(db.get_engine(), checkfirst=True)
-        # db.metadata.create_all(db.get_engine(), checkfirst=True)
-        # Insert dummy data
+        # db.metadata.drop_all(db.get_engine())
+        # db.metadata.create_all(db.get_engine())
+        insert_dummy_data(db)
         # Start
 
     return app
