@@ -15,7 +15,7 @@ def is_super_user_session(session) -> bool:
     Checks whether the current session is a super_user session
 
     """
-    if session:
+    if session.bind is None or session.bind == "postgres":
         return True
     return False
 
@@ -34,6 +34,7 @@ def role_exists(session, role) -> bool:
         for row in result:
             if role in row[0]:
                 return True
+        return False
     else:
         print("Role " + role + " does not exist")
     return False
@@ -44,12 +45,13 @@ def grant_connection(session, role: str, database="postgres", schema="public"):
     Script that grants connection privilege to a particular role to a database associated with the current session.
 
     """
-    session.execute(text(
-        "GRANT CONNECT ON DATABASE " + database + " TO " + role + ";"
-    ))
-    session.execute(text(
-        "GRANT USAGE ON SCHEMA " + schema + " TO " + role + ";"
-    ))
+    if is_super_user_session(session) and role_exists(session, role):
+        session.execute(text(
+            "GRANT CONNECT ON DATABASE " + database + " TO " + role + ";"
+        ))
+        session.execute(text(
+            "GRANT USAGE ON SCHEMA " + schema + " TO " + role + ";"
+        ))
     pass
 
 
@@ -78,36 +80,36 @@ def drop_all_roles(session):
 
 
 def create_role(session, role, superuser=False):
-    if role in VALID_USERS.keys:
+    statement = ""
+    if role in VALID_USERS.keys():
         if superuser:
-            session.execute(text(
-                "CREATE ROLE " + role + " WITH\n"
-                                        "\tLOGIN\n"
-                                        "\tSUPERUSER\n"
-                                        "\tNOCREATEDB\n"
-                                        "\tNOCREATEROLE\n"
-                                        "\tNOINHERIT\n"
-                                        "\tNOREPLICATION\n"
-                                        "\tCONNECTION LIMIT -1\n"
-                                        "\tENCRYPTED PASSWORD '{0}';".format(VALID_USERS.get(role))))
+            statement = "CREATE ROLE " + role + " WITH\n" \
+                                                " \tLOGIN\n " \
+                                                "\tSUPERUSER\n" \
+                                                "\tNOCREATEDB\n" \
+                                                "\tNOCREATEROLE\n" \
+                                                "\tNOINHERIT\n" \
+                                                "\tNOREPLICATION\n" \
+                                                "\tCONNECTION LIMIT -1\n" \
+                                                "\tENCRYPTED PASSWORD '{0}';".format(VALID_USERS.get(role))
         else:
-            session.execute(text(
-                "CREATE ROLE " + role + " WITH\n"
-                                        "\tLOGIN\n"
-                                        "\tNOSUPERUSER\n"
-                                        "\tNOCREATEDB\n"
-                                        "\tNOCREATEROLE\n"
-                                        "\tNOINHERIT\n"
-                                        "\tNOREPLICATION\n"
-                                        "\tCONNECTION LIMIT -1\n"
-                                        "\tENCRYPTED PASSWORD '{0}';".format(VALID_USERS.get(role))))
+            statement = "CREATE ROLE " + role + " WITH\n" \
+                                                "\tLOGIN\n" \
+                                                "\tNOSUPERUSER\n" \
+                                                "\tNOCREATEDB\n" \
+                                                "\tNOCREATEROLE\n" \
+                                                "\tNOINHERIT\n" \
+                                                "\tNOREPLICATION\n" \
+                                                "\tCONNECTION LIMIT -1\n" \
+                                                "\tENCRYPTED PASSWORD '{0}';".format(VALID_USERS.get(role))
+        session.execute(text(statement))
         grant_connection(session, role)
     else:
         raise PermissionError("The only valid roles are described in config.py -> VALID_USERS")
     pass
 
 
-def grant_privilege(session, role: str, privilege: str, tables):
+def grant_privilege(session, role: str, privilege: str, tables=None):
     # Check session is super
     # Check role exists
     # Check privilege exists
@@ -120,11 +122,11 @@ def grant_privilege(session, role: str, privilege: str, tables):
         statement = "GRANT " + privilege + " ON "
         # Add commas until the last table has been reached.
         for t in tables:
-            statement += t + " ,"
+            statement += "\"" + t + "\"" + " ,"
         # Remove last comma
         statement = statement.rstrip(statement[-1])
         # Assign to role
-        statement += " TO " + role + " ;"
+        statement += "TO " + role + ";"
     session.execute(text(statement))
     pass
 
@@ -159,19 +161,14 @@ def check_all_privileges(session):
 
 def init_serverside_roles(session, drop_first=True):
     """
-    Initialize server-side ROLEs for listener, premium, creator, admin. creator inherits from premium,
-    which in turn inherits from listener. It drops the roles upon creation for integrity purposes.
+    Initialize server-side ROLEs. It can drop the roles upon creation for integrity purposes.
+    :param drop_first:
     :param session: Session object with privileges for creating new roles on the database
     """
     if drop_first is True:
         drop_all_roles(session)
-    create_role_listener(session)
-    create_role_premium(session)
-    create_role_creator(session)
-    create_role_admin(session)
+    create_role(session, "admin", superuser=False)
+    grant_connection(session, "admin")
+    grant_privilege(session, "admin", "SELECT", ["user"])
     pass
 
-
-if __name__ == '__main__':
-    grant_privilege(session=None, role="student", privilege="SELECT", tables=["User, Exam, Course"])
-    pass

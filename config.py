@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import engine_from_config
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.engine import URL
+from werkzeug.security import generate_password_hash
 
 PRIVILEGES = ["SELECT", "INSERT", "UPDATE", "DELETE", "ALL"]
 

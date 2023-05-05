@@ -8,8 +8,37 @@ from sqlalchemy import text
 from faker import Faker
 from faker.providers import profile, phone_number, job
 import bcrypt
-import models
-from globals import PROGRAMS
+from data.models import User, Program, Course, Exam, Sitting
+from werkzeug.security import generate_password_hash
+
+ARCHAEOLOGY = ["Aerial archaeology", "Aviation archaeology", "Anthracology",
+               "Archaeogeography", "Archaeological culture", "Archaeological theory"
+                                                             "Manuscriptology", "Maritime archaeology",
+               "Media archaeology"]
+HISTORY = []
+LINGUISTICS = []
+LITERATURE = []
+ECONOMICS = []
+POLITICALSCIENCE = []
+PSYCHOLOGY = []
+BIOLOGY = []
+CHEMISTRY = []
+PHYSICS = []
+COMPUTERSCIENCE = []
+
+PROGRAMS = {
+    "Archaeology": ARCHAEOLOGY,
+    "History": HISTORY,
+    "Linguistics and languages": LINGUISTICS,
+    "Literature": LITERATURE,
+    "Economics": ECONOMICS,
+    "Political science": POLITICALSCIENCE,
+    "Psychology": PSYCHOLOGY,
+    "Biology": BIOLOGY,
+    "Chemistry": CHEMISTRY,
+    "Physics": PHYSICS,
+    "Computer science": COMPUTERSCIENCE,
+}
 
 
 def return_dates_range(min_age=18, max_age=70):
@@ -54,7 +83,7 @@ def generate_user_data(count: int, role: str, mail_suffix: str, min_age=18, max_
         data = {
             'role': role,
             'email': email,
-            'password_hash': bcrypt.hashpw(soc_sec_num.encode('utf-8'), bcrypt.gensalt()).decode('utf-8'),
+            'password_hash': generate_password_hash(password=soc_sec_num, salt_length=8),
             'first_name': new_person.get('name').split()[0],
             'last_name': new_person.get('name').split()[1],
             'birth_day': fake.date_between(start_date=start_date, end_date=end_date),
