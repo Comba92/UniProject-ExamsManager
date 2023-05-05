@@ -6,6 +6,8 @@ from sqlalchemy import engine_from_config
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.engine import URL
 
+PRIVILEGES = ["SELECT", "INSERT", "UPDATE", "DELETE", "ALL"]
+
 ENG_PROD_CONFIG = {
     'sqlalchemy.url': "",
     'sqlalchemy.hide_parameters': True,
@@ -24,9 +26,6 @@ ENG_DEV_CONFIG = {
     'sqlalchemy.pool_size': 10,
     'sqlalchemy.max_overflow': 5,
 }
-
-# There must be at least one valid user for the database, the superuser
-VALID_USERS = {}
 
 
 def get_from_env(env_var: str):
@@ -47,6 +46,21 @@ def get_from_env(env_var: str):
     else:
         raise TypeError("Requested str type for env_var")
     pass
+
+
+# There must be at least one valid user for the database, the superuser
+VALID_USERS = {
+    # "postgres"
+    get_from_env("USER"): get_from_env("PASSWORD"),
+    # "board"
+    get_from_env("BOARD"): generate_password_hash(password=get_from_env("BOARD_PSW"), salt_length=8),
+    # "professor"
+    get_from_env("PROF"): generate_password_hash(password=get_from_env("PROF_PSW"), salt_length=8),
+    # "student"
+    get_from_env("STUD"): generate_password_hash(password=get_from_env("STUD_PSW"), salt_length=8),
+    # "admin"
+    get_from_env("ADMIN"): generate_password_hash(password=get_from_env("ADMIN_PSW"), salt_length=8),
+}
 
 
 def add_valid_user(user: str, password: str):
@@ -136,7 +150,7 @@ class Config:
     """
     Base configuration for the Flask Application. It includes Engine configurations for SQLAlchemy object.
     """
-    add_valid_user("USER", "PASSWORD")
+    # add_valid_user("USER", "PASSWORD")
     # add more valid users here
     VALID_USERS_lst = list(VALID_USERS.keys())
 
@@ -190,5 +204,3 @@ class DevConfig(Config):
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_RECORD_QUERIES = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-
-

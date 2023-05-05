@@ -10,90 +10,55 @@ should be made by the relative provider class before creating new instances.
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from sqlalchemy_utils import create_view
 
 db = SQLAlchemy()
 
-
 # Association Tables -------------------------------------------------------
 
-# Sitting <<-- ReservedBy(Date Reserved) -->> Student (Association Table)
-class Reserves(db.Model):
-    """
-    Association Table for students' reservations.
-
-    When a sitting has been published, then students can reserve a spot. Users cannot reserve
-    sittings when they already have other exams at the same time, they need to delete the previous
-    reservation and add a new one. Students cannot reserve the same exam for the same day twice, unless
-    they delete the previous reservation.
-
-    """
-
-    __tablename__ = 'reserves'
-
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"),
-                        primary_key=True)
-    sitting_id = db.Column(db.Integer, db.ForeignKey('sitting.id', ondelete="CASCADE"),
-                           primary_key=True)
-    date_reserved = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
-    pass
-
+# Student <<-- Reserves -->> Sitting
+reserves = db.Table(
+    'reserves', db.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('sitting_id', db.Integer, db.ForeignKey('sitting.id'), primary_key=True),
+    db.Column('date_reserved', db.DateTime, nullable=False, default=datetime.datetime.utcnow()),
+    comment='Association Table for students\' reservations. When a sitting has been published, '
+            'then students can reserve a spot. Users cannot reserve sittings when they already '
+            'have other exams at the same time, they need to delete the previous reservation '
+            'and add a new one. Students cannot reserve the same exam for the same day twice, '
+            'unless they delete the previous reservation.')
 
 # Program <<-- Includes -->> Course
-class Includes(db.Model):
-    """
-    Association Table for the courses belonging to a program. A course might be included in multiple programs, and
-    programs have many courses.
-
-    """
-
-    __tablename__ = 'includes'
-
-    program_id = db.Column(db.Integer, db.ForeignKey('program.id', ondelete="CASCADE"),
-                           primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id', ondelete="CASCADE"),
-                          primary_key=True)
-    pass
-
+includes = db.Table(
+    'includes', db.metadata,
+    db.Column('program_id', db.Integer, db.ForeignKey('program.id'), primary_key=True),
+    db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    comment='Association Table for the courses belonging to a program. '
+            'A course might be included in multiple programs, and programs have many courses.')
 
 # Student <<-- Follows -->> Course
-class Follows(db.Model):
-    """
-    Association Table for the courses followed by the students. The student may follow different course (even courses
-    that are not strictly related to the programs they follow) and if they pass the course, their final grade is
-    memorized when the conditions for final evaluation are met (valid, not expired...).
+follows = db.Table(
+    'follows', db.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    db.Column('final_grade', db.Integer, nullable=True),
+    db.Column('registry_date', db.DateTime, nullable=True),
+    comment='Association Table for the courses followed by the students. '
+            'The student may follow different course (even courses '
+            'that are not strictly related to the programs they follow) '
+            'and if they pass the course, their final grade is memorized '
+            'when the conditions for final evaluation are met (valid, not expired...)')
 
-
-    """
-
-    __tablename__ = 'follows'
-
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"),
-                        primary_key=True)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id', ondelete="CASCADE"),
-                          primary_key=True)
-    final_grade = db.Column(db.Integer, nullable=False)
-    registry_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
-    pass
-
-
-# Student <-- Subscribes --> Program
-class Subscribes(db.Model):
-    """
-    Association Table for the students' programs. A student may be subscribed to multiple programs as long as
-    only one program has no final grade and no registry date. When a student graduates, the final grade is registered.
-
-    """
-
-    __tablename__ = 'subscribes'
-
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"),
-                        primary_key=True)
-    program_id = db.Column(db.Integer, db.ForeignKey('program.id', ondelete="CASCADE"),
-                           primary_key=True)
-    final_grade = db.Column(db.Integer, nullable=True)
-    registry_date = db.Column(db.DateTime, nullable=True)
-    pass
+# Student <<-- Subscribes -->> Program
+subscribes = db.Table(
+    'subscribes', db.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('program_id', db.Integer, db.ForeignKey('program.id'), primary_key=True),
+    db.Column('final_grade', db.Integer, nullable=True),
+    db.Column('registry_date', db.DateTime, nullable=True),
+    comment='Association Table for the students\' programs. '
+            'A student may be subscribed to multiple programs as long as'
+            'only one program has no final grade and no registry date. '
+            'When a student graduates, the final grade is registered.')
 
 
 # Tables -------------------------------------------------------------------
@@ -119,54 +84,51 @@ class User(db.Model, UserMixin):
     birth_address = db.Column(db.String, nullable=False)
     social_security_number = db.Column(db.String(128), nullable=False)
     address = db.Column(db.String, nullable=False)
-    phone_number = db.Column(db.String(128), unique=True, nullable=False)
     member_since = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
     last_update = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
     last_login = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
     last_logout = db.Column(db.DateTime, index=False, nullable=True)
 
     # Relationships
-    # User(Board) <-- Manages -->> Program
-    programs_created = db.relationship("Program", back_populates="board")
-    # Student <<-- Subscribes -->> Program (More if they have graduated)
-    programs = db.relationship(argument="Subscribes",
-                               foreign_keys=[Subscribes.user_id],
-                               lazy='dynamic',
-                               cascade='all, delete')
-    # User(Board) <-- Creates -->> Courses
-    courses_created = db.relationship("Course", back_populates="board")
-    # User(Professor) <--  Presides --> Program
     # User(Professor) <-- AssignedTo -->> Course
-    courses = db.relationship("Course", back_populates="professor")
-    # User(Student) <<-- Follows -->> Courses
-    followed = db.relationship('Follows', foreign_keys=[Follows.course_id],
-                               back_populates="students",
-                               lazy='dynamic',
-                               cascade='all, delete')
-    # User(Student) <<-- Reserves -->> Sitting
-    reservations = db.relationship('Reserves', foreign_keys=[Reserves.sitting_id],
-                                   back_populates="bookers",
-                                   lazy='dynamic',
-                                   cascade='all, delete')
+    assigned_to = db.relationship(argument='Course',
+                                  back_populates='professor')
     # User(Student) <-- Accepts -->> Assessment
-    assessments = db.relationship("Assessment", back_populates="student")
-    
+    evaluations = db.relationship(argument='Assessment',
+                                  back_populates='student')
+    # User(Student) <<-- Subscribes -->> Program (More if they have graduated)
+    programs = db.relationship(argument='Program',
+                               secondary=subscribes,
+                               back_populates='students')
+    # User(Student) <<-- Follows -->> Courses
+    courses = db.relationship(argument='Course',
+                              secondary=follows,
+                              back_populates='students')
+    # User(Student) <<-- Reserves -->> Sitting
+    reservations = db.relationship(argument='Sitting',
+                                   secondary=reserves,
+                                   back_populates='bookers')
+
     def __init__(self, data):
-        role = data.get('role')
-        email = data.get('email')
-        password_hash = data.get('password_hash')
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
-        birth_day = data.get('birth_day')
-        birth_address = data.get('birth_address')
-        social_security_number = data.get('ssn')
-        address = data.get('address')
-        phone_number = data.get('phone_number')
-        member_since = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
-        last_update = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
-        last_login = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
+        self.role = data.get('role')
+        self.email = data.get('email')
+        self.password_hash = data.get('password_hash')
+        self.first_name = data.get('first_name')
+        self.last_name = data.get('last_name')
+        self.birth_day = data.get('birth_day')
+        self.birth_address = data.get('birth_address')
+        self.social_security_number = data.get('ssn')
+        self.address = data.get('address')
+        self.phone_number = data.get('phone_number')
+        self.member_since = datetime.datetime.utcnow()
+        self.last_update = datetime.datetime.utcnow()
+        self.last_login = datetime.datetime.utcnow()
+        self.last_logout = None
         pass
-    
+
+    def __repr__(self):
+        return f'<User: {self.email}>'
+
     pass
 
 
@@ -195,18 +157,18 @@ class Program(db.Model):
     end = db.Column(db.DateTime, nullable=False)
 
     # Relationships
-    # Program <<-- CreatedBy --> Board
-    board_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    board = db.relationship("User", back_populates="programs_created")
     # Program <<-- Includes -->> Course (Association Table)
-    courses = db.relationship('Includes', foreign_keys=[Includes.course_id],
-                              lazy='dynamic',
-                              cascade='all, delete')
+    courses = db.relationship(argument='Course',
+                              secondary=includes,
+                              back_populates='programs')
     # Student <<-- Subscribes -->> Program (More if they have graduated)
-    students = db.relationship(argument="Subscribes",
-                               foreign_keys=[Subscribes.program_id],
-                               lazy='dynamic',
-                               cascade='all, delete')
+    students = db.relationship(argument='User',
+                               secondary=subscribes,
+                               back_populates='programs')
+
+    def __repr__(self):
+        return f'<Program: {self.name}>'
+
     pass
 
 
@@ -233,29 +195,35 @@ class Course(db.Model):
     semester = db.Column(db.Integer, nullable=False, default=1)
     # Module
     module = db.Column(db.Integer, nullable=True, default=1)
-    # Program of the course
-    program = db.Column(db.Text, nullable=False, default="An Academic Course!")
 
     # Relationships
-    # Course <<-- CreatedBy --> Board
-    board_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    board = db.relationship("User", back_populates="courses_created")
     # Course <<-- AssignedTo --> Professor (FK -> Professor)
     professor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    professor = db.relationship("User", back_populates="courses")
+    professor = db.relationship(argument='User',
+                                back_populates="assigned_to")
     # Program <<-- Includes -->> Course (Association Table)
-    programs = db.relationship('Includes', foreign_keys=[Includes.program_id],
-                               back_populates="courses",
-                               lazy='dynamic',
-                               cascade='all, delete')
+    programs = db.relationship(argument='Program',
+                               secondary=includes,
+                               back_populates='courses')
     # Course <<-- PassedBy -->> Student (Association Table)
-    students = db.relationship('Follows', foreign_keys=[Follows.user_id],
-                               back_populates="followed",
-                               lazy='dynamic',
-                               cascade='all, delete')
+    students = db.relationship(argument='User',
+                               secondary=follows,
+                               back_populates='courses')
     # Course <-- ComposedOf -->> Exam (n>=1) (FK in Exam)
-    exams = db.relationship("Exam", back_populates="course", cascade="all, delete")
+    exams = db.relationship(argument='Exam',
+                            back_populates='course',
+                            cascade='all, delete')
     # Constraints
+
+    def __init__(self, data):
+        self.name = data.get('name')
+        self.credits = int(data.get('credits'))
+        self.semester = int(data.get('semester'))
+        self.module = int(data.get('module'))
+        pass
+
+    def __repr__(self):
+        return f'<Course: {self.name}>'
 
     pass
 
@@ -296,16 +264,21 @@ class Exam(db.Model):
     expiry_date = db.Column(db.DateTime, index=False, unique=False, nullable=False)
 
     # Relationships
-    # Exam <<-- Created By --> Professor (Not needed, FK in Course)
     # Course <-- Requires -->> Exam (n>=1)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id', ondelete="CASCADE"))
-    course = db.relationship("Course", back_populates="exams")
+    course = db.relationship(argument='Course',
+                             back_populates="exams")
     # Exam <-- Has -->> Sitting (FK in Sitting)
-    sittings = db.relationship("Sitting", back_populates="exam", cascade="all, delete")
+    sittings = db.relationship(argument='Sitting',
+                               back_populates="exam",
+                               cascade="all, delete")
 
     # Constraints
     # Check that all the exams for a course sum up to 100 in percentage + 2-3 bonus points
     # If optional -> Weight is a bonus point 1-3
+
+    def __repr__(self):
+        return f'<Exam: {self.name}>'
 
     pass
 
@@ -340,19 +313,24 @@ class Sitting(db.Model):
     # Relationships
     # Exam <-- Attempted -->> Sitting (FK -> Exam)
     exam_id = db.Column(db.Integer, db.ForeignKey('exam.id', ondelete="CASCADE"))
-    exam = db.relationship("Exam", back_populates="sittings")
-    # Student <<-- Reserves -->> Sitting (Association Table)
-    bookers = db.relationship('Reserves', foreign_keys=[Reserves.user_id],
-                              back_populates="reservations",
-                              lazy='dynamic',
-                              cascade='all, delete')
+    exam = db.relationship(argument='Exam',
+                           back_populates="sittings")
     # Sitting <-- Contains -->> Assessment
-    assessments = db.relationship("Assessment", back_populates="sitting", cascade="all, delete")
+    assessments = db.relationship(argument='Assessment',
+                                  back_populates="sitting",
+                                  cascade="all, delete")
+
+    # Student <<-- Reserves -->> Sitting (Association Table)
+    bookers = db.relationship(argument='User',
+                              secondary=reserves,
+                              back_populates='reservations')
 
     # Constraints
     # Start < End
     # Unique (Building, Room, Start, End)
     # Exams for 6 ECTS -> 1:30h, for 12 ECTS -> 3h
+    def __repr__(self):
+        return f'<Course: {self.id}>'
 
     pass
 
@@ -384,14 +362,21 @@ class Assessment(db.Model):
 
     # Relationships
     # Assessment <<-- RefersTo --> Sitting (FK to Assessment)
-    sitting_id = db.Column(db.Integer, db.ForeignKey('sitting.id', ondelete="CASCADE"))
-    sitting = db.relationship("Sitting", back_populates="assessments")
+    sitting_id = db.Column(db.Integer,
+                           db.ForeignKey('sitting.id', ondelete="CASCADE"))
+    sitting = db.relationship(argument='Sitting',
+                              back_populates="assessments")
     # Assessment <<-- AcceptedBy --> Student (If the reservation was made)
-    student_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete="CASCADE"))
-    student = db.relationship("User", back_populates="assessments")
+    student_id = db.Column(db.Integer,
+                           db.ForeignKey('user.id', ondelete="CASCADE"))
+    student = db.relationship(argument='User',
+                              back_populates='evaluations')
 
     def __init__(self, grade: int, valid: bool, ):
         pass
+
+    def __repr__(self):
+        return f'<Assessment: {self.id}>'
 
     pass
 
@@ -420,3 +405,4 @@ class Assessment(db.Model):
 # 4) - View for all exams done
 # student_id, email, course_id, course_name, module, part, grade, valid, accepted
 # 5) - View stats for career
+
