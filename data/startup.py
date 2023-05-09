@@ -54,6 +54,10 @@ def return_dates_range(min_age=18, max_age=70):
         return_dates_range()
 
 
+def generate_roles():
+    pass
+
+
 def generate_user_data(count: int, role: str, mail_suffix: str, min_age=18, max_age=70):
     """
     Random users' generator using faker providers and local sqlalchemy models,
@@ -129,15 +133,64 @@ def generate_programs():
     pass
 
 
-def insert_dummy_data(db):
+def delete_all(db, instances):
+    """
+    Deletes all instances from the database
+
+    :param db: engine or SQLAlchemy Object
+    :param instances: array of table instances
+    :return: None
+    """
+    for i in instances:
+        db.session.delete(i)
+        db.session.commit()
+    pass
+
+
+def delete_users(db):
+    """
+    Deletes all users from the database
+
+    :param db: engine or SQLAlchemy Object
+    :return: None
+    """
+    users = User.query.all()
+    delete_all(db, users)
+    pass
+
+
+def delete_programs(db):
+    """
+    Deletes all programs from the database
+
+    :param db: engine or SQLAlchemy Object
+    :return: None
+    """
+    programs = Program.query.all()
+    delete_all(db, programs)
+    pass
+
+
+def delete_courses(db):
+    """
+    Deletes all courses from the database
+
+    :param db: engine or SQLAlchemy Object
+    :return: None
+    """
+    courses = Course.query.all()
+    delete_all(db, courses)
+    pass
+
+
+def insert_dummy_data(db, drop_first=True):
     """
     Inserts dummy data inside the db, assuming the tables are created
     """
     # Data generation
+    if drop_first:
+        delete_users(db)
+        # delete_programs(db)
+        # delete_courses(db)
     insert_generated_users(db)
-    pass
-
-
-if __name__ == '__main__':
-    generate_programs()
     pass

@@ -90,7 +90,7 @@ class EngineFactory:
     def __init__(self, user):
         """
         Constructor for EngineFactory object
-        :param user: must be one of the following "postgres", "listener", "premium", "creator", "admin"
+        :param user: must be one of the VALID_USERS
         :raises Ex
         """
 
@@ -171,13 +171,32 @@ class Config:
     TEMPLATES_FOLDER = 'templates'
     SQLALCHEMY_DATABASE_URI = EngineFactory(VALID_USERS_lst[0]).get_url()
 
-    SQLALCHEMY_BINDS = {}
-    for i in range(len(VALID_USERS_lst)):
-        if "USER" in VALID_USERS_lst[i]:
-            continue
-        else:
-            SQLALCHEMY_BINDS.update({VALID_USERS_lst[i]: EngineFactory(VALID_USERS_lst[i]).get_url()})
-        pass
+    # SQLALCHEMY_BINDS = {}
+    # for i in range(len(VALID_USERS_lst)):
+    #     if "USER" in VALID_USERS_lst[i]:
+    #         continue
+    #     else:
+    #         SQLALCHEMY_BINDS.update({VALID_USERS_lst[i]: EngineFactory(VALID_USERS_lst[i]).get_url()})
+    #     pass
+
+    # Flask Mail
+    # Flask-Mail SMTP server settings
+    # MAIL_SERVER = 'smtp.gmail.com'
+    # MAIL_PORT = 465
+    # MAIL_USE_SSL = True
+    # MAIL_USE_TLS = False
+    # MAIL_USERNAME = 'email@example.com'
+    # MAIL_PASSWORD = 'password'
+    # MAIL_DEFAULT_SENDER = '"MyApp" <noreply@example.com>'
+
+    # Flask-User settings
+    # USER_APP_NAME = "Flask-User Basic App"  # Shown in and email templates and page footers
+    # USER_ENABLE_EMAIL = True  # Enable email authentication
+    # USER_ENABLE_USERNAME = False  # Disable username authentication
+    # USER_EMAIL_SENDER_NAME = USER_APP_NAME
+    # USER_EMAIL_SENDER_EMAIL = "noreply@example.com"
+
+    pass
 
 
 class ProdConfig(Config):

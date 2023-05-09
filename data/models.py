@@ -8,8 +8,9 @@ should be made by the relative provider class before creating new instances.
 """
 
 import datetime
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 
@@ -60,8 +61,51 @@ subscribes = db.Table(
             'only one program has no final grade and no registry date. '
             'When a student graduates, the final grade is registered.')
 
+user_roles = db.Table(
+    'user_roles', db.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('role_id', db.Integer, db.ForeignKey('role.id', ondelete='CASCADE'), primary_key=True),
+    comment='Association Table for user\'s roles')
+
 
 # Tables -------------------------------------------------------------------
+
+class Role(db.Model):
+    """
+    Role Class
+
+    Defines possible user actions based on the role
+    """
+
+    __tablename__ = "role"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement="auto")
+    name = db.Column(db.String, unique=True, nullable=False)
+
+    # Relationships
+    # User <<-- Has -->> Role
+    users = db.relationship('User',
+                            secondary=user_roles,
+                            back_populates='roles')
+
+    def __init__(self):
+        # TODO: define the permissions for later usage on routes @roles_required
+        # https://flask-user.readthedocs.io/en/latest/authorization.html
+        roles = ["LOGIN", "BOOK", "ASSESSMENT"]
+        pass
+
+    def __repr__(self):
+        pass
+
+    def to_dict(self) -> dict:
+        data = {
+            'id': self.id,
+            'name': self.name
+        }
+        return data
+
+    pass
+
 
 class User(db.Model, UserMixin):
     """
@@ -75,7 +119,6 @@ class User(db.Model, UserMixin):
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement="auto")
-    role = db.Column(db.String(128), unique=False, nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
     password_hash = db.Column(db.String, nullable=False)
     first_name = db.Column(db.String(128), nullable=False, default="Unknown")
@@ -90,6 +133,7 @@ class User(db.Model, UserMixin):
     last_logout = db.Column(db.DateTime, index=False, nullable=True)
 
     # Relationships
+
     # User(Professor) <-- AssignedTo -->> Course
     assigned_to = db.relationship(argument='Course',
                                   back_populates='professor')
@@ -108,6 +152,10 @@ class User(db.Model, UserMixin):
     reservations = db.relationship(argument='Sitting',
                                    secondary=reserves,
                                    back_populates='bookers')
+    # User <<-- Has -->> Roles
+    roles = db.relationship(argument='Role',
+                            secondary=user_roles,
+                            back_populates='users')
 
     def __init__(self, data):
         self.role = data.get('role')
@@ -128,6 +176,138 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f'<User: {self.email}>'
+
+    @staticmethod
+    def load(user_id):
+        return None
+
+    def set_password_hash(self, password):
+        pass
+
+    # @login_manager.user_loader
+    # def load_user(user_id):
+    #     return User.get(user_id)
+
+    # Data Validation
+
+    # Ping
+
+    # isAnonymous
+    def is_anonymous(self):
+        return False
+
+    # isAuthenticated
+    def is_authenticated(self):
+        pass
+
+    # isActive
+    def is_active(self):
+        pass
+
+    # Register
+
+    # Login
+
+    # Logout
+
+    def to_dict(self) -> dict:
+        """
+        Returns dictionary with user's information
+
+        :return: dictionary
+        """
+        data = {
+            'role': self.role,
+            'email': self.email,
+            'password_hash': self.password_hash,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'birth_day': self.birth_day,
+            'birth_address': self.birth_address,
+            'address': self.address,
+            'ssn': self.social_security_number,
+            'phone_number': self.phone_number,
+            'member_since': self.member_since,
+            'last_update': self.last_update,
+            'last_login': self.last_login,
+            'last_logout': self.last_logout,
+        }
+        return data
+
+    def get_id(self) -> int:
+        return self.id
+
+    # Board  ------------------------------
+
+    # Create Program
+    def create_program(self, data):
+        if self.role == 'Board':
+            new_program = Program(data)
+        pass
+
+    # Remove Program
+    def remove_program(self, program_id):
+        pass
+
+    # Add Course To Program
+    def add_course_to_program(self, program_id, course_id):
+        pass
+
+    # Remove Course From Program
+    def remove_course_to_program(self, program_id, course_id):
+        pass
+
+    # Create Course
+    def create_course(self, data):
+        pass
+
+    # Remove Course
+    def remove_course(self, course_id):
+        pass
+
+    # Assign Course to Professor
+    def assign_course_prof(self, course_id, professor_id):
+        pass
+
+    # Remove Course from Professor
+    def remove_course_prof(self, course_id, professor_id):
+        pass
+
+    # Professor ---------------------------
+
+    # Student -----------------------------
+
+    # Subscribe to Program
+    def subscribe(self, program_id):
+        pass
+
+    # Unsubscribe from Program
+    def unsubscribe(self, program_id):
+        pass
+
+    # Follow Course (unless in the program)
+    def follow(self, course_id):
+        pass
+
+    # Unfollow Course (unless in the program)
+    def unfollow(self, course_id):
+        pass
+
+    # Add Booking
+    def book(self, sitting_id):
+        pass
+
+    # Remove Booking
+    def undo_booking(self, sitting_id):
+        pass
+
+    # Accept Assessment
+    def accept(self, assessment_id):
+        pass
+
+    # Refuse Assessment
+    def refuse(self, assessment_id):
+        pass
 
     pass
 
@@ -166,8 +346,27 @@ class Program(db.Model):
                                secondary=subscribes,
                                back_populates='programs')
 
+    def __init__(self, data):
+        self.name = data.get('name')
+        self.credits = data.get('credits')
+        self.start = data.get('start')
+        self.end = data.get('end')
+        pass
+
     def __repr__(self):
         return f'<Program: {self.name}>'
+
+    def to_dict(self) -> dict:
+        data = {'id': self.id,
+                'name': self.name,
+                'credits': self.credits,
+                'start': self.start,
+                'end': self.end}
+        return data
+
+    @staticmethod
+    def load(program_id):
+        return db.select(Program).filter_by(id=program_id)
 
     pass
 
@@ -213,6 +412,7 @@ class Course(db.Model):
     exams = db.relationship(argument='Exam',
                             back_populates='course',
                             cascade='all, delete')
+
     # Constraints
 
     def __init__(self, data):
@@ -224,6 +424,18 @@ class Course(db.Model):
 
     def __repr__(self):
         return f'<Course: {self.name}>'
+
+    def to_dict(self) -> dict:
+        data = {'id': self.id,
+                'name': self.name,
+                'credits': self.credits,
+                'semester': self.semester,
+                'module': self.module}
+        return data
+
+    @staticmethod
+    def load(self):
+        pass
 
     pass
 
@@ -259,9 +471,10 @@ class Exam(db.Model):
     # Weight of the exam (1-100)
     weight = db.Column(db.Integer, nullable=False, default=100)
     # If it is optional (if so the weight is 1-3)
-    optional = db.Column(db.Boolean)
+    optional = db.Column(db.Boolean, default=False)
     # Expiry date (for exam validity)
-    expiry_date = db.Column(db.DateTime, index=False, unique=False, nullable=False)
+    expiry_date = db.Column(db.DateTime, index=False, unique=False, nullable=False,
+                            default=(datetime.datetime.utcnow() + datetime.timedelta(days=100)))
 
     # Relationships
     # Course <-- Requires -->> Exam (n>=1)
@@ -306,7 +519,7 @@ class Sitting(db.Model):
     # Start date-time
     start = db.Column(db.DateTime, nullable=False)
     # End date-time
-    end = db.Column(db.DateTime, nullable=False)
+    end = db.Column(db.DateTime, nullable=False, default=(start + datetime.timedelta(hours=2)))
     # How many students can sit it (for a trigger before insert)
     max_participants = db.Column(db.Integer, nullable=False, default=150)
 
@@ -324,6 +537,9 @@ class Sitting(db.Model):
     bookers = db.relationship(argument='User',
                               secondary=reserves,
                               back_populates='reservations')
+
+    def __init__(self):
+        pass
 
     # Constraints
     # Start < End
@@ -352,57 +568,68 @@ class Assessment(db.Model):
     grade = db.Column(db.Integer, nullable=False)
     # True if grade >= passing grade
     valid = db.Column(db.Boolean, nullable=False, default=True)
-    evaluation_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow())
+    evaluation_date = db.Column(db.DateTime, nullable=False,
+                                default=datetime.datetime.utcnow())
     # Default 10 days from evaluation date, after which the exam expires
-    expiry_acceptance_date = db.Column(db.DateTime, nullable=False)
+    expiry_acceptance_date = db.Column(db.DateTime, nullable=False,
+                                       default=(datetime.datetime.utcnow() + datetime.timedelta(days=10)))
     # Modified by student when they accept it
     # NULL -> failed, True -> accepted, False -> rejected/expired
-    accepted = db.Column(db.Boolean, nullable=True)
-    acceptance_date = db.Column(db.DateTime, nullable=True)
+    accepted = db.Column(db.Boolean, nullable=True, default=None)
+    acceptance_date = db.Column(db.DateTime, nullable=True, default=None)
 
     # Relationships
     # Assessment <<-- RefersTo --> Sitting (FK to Assessment)
     sitting_id = db.Column(db.Integer,
-                           db.ForeignKey('sitting.id', ondelete="CASCADE"))
+                           db.ForeignKey('sitting.id', ondelete="CASCADE"),
+                           nullable=False)
     sitting = db.relationship(argument='Sitting',
                               back_populates="assessments")
     # Assessment <<-- AcceptedBy --> Student (If the reservation was made)
     student_id = db.Column(db.Integer,
-                           db.ForeignKey('user.id', ondelete="CASCADE"))
+                           db.ForeignKey('user.id', ondelete="CASCADE"),
+                           nullable=False)
     student = db.relationship(argument='User',
                               back_populates='evaluations')
 
-    def __init__(self, grade: int, valid: bool, ):
+    def __init__(self, data):
+        """
+        Constructor
+
+        Callable from a professor, who can only grade it. It may be created only if a student
+        has made a reservation for the sitting_id.
+
+        :param data: dictionary with 'grade'
+        """
+        self.grade = data.get('grade')
+        if self.grade < 18:
+            self.valid = False
+        else:
+            self.valid = True
         pass
+
+    @staticmethod
+    def load(assessment_id):
+        return db.session.select(Assessment).filter_by(Assessment.id == assessment_id)
+
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'grade': self.grade,
+            'valid': self.valid,
+            'evaluation_date': self.evaluation_date,
+            'expiry_acceptance_date': self.expiry_acceptance_date,
+            'accepted': self.accepted,
+            'acceptance_date': self.acceptance_date,
+            'sitting_id': self.sitting_id,
+            'student_id': self.student_id
+        }
+        return data
 
     def __repr__(self):
         return f'<Assessment: {self.id}>'
 
+    # Assessment is created by professor, it refers to a sitting and a student
+    # Assessment is updated by student, they can accept/refuse
+
     pass
-
-# Views ------------------------------------------------------
-
-# Professor's Views
-#
-# 1) - View for professor's courses
-# prof_id, email, course_id, course_name, academic_year,
-#
-# 2) - View for exams to evaluate
-#
-# 3) - View for exams evaluated
-#
-# 4) - Stats for exams
-
-# Student's Views
-# 0) - View for student's study plan
-# student_id, email, program_id, program_name, course_id, course_name,
-# 1) - View for student's exam reservations
-# student_id, email, course_id, course_name, module, part, starting_date, end_date, building, room
-# 2) - View for exams to be accepted
-#
-# 3) - View for registered exams
-# student_id, email, course_id, course_name, final_grade, date_registered
-# 4) - View for all exams done
-# student_id, email, course_id, course_name, module, part, grade, valid, accepted
-# 5) - View stats for career
-

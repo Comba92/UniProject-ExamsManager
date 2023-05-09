@@ -1,26 +1,18 @@
+"""
+Module for dummy data generation
+
+"""
+
 from flask import Flask
 from data.models import db
 from flask_login import LoginManager
-from data.startup import insert_dummy_data
-from data.roles import init_serverside_roles
+from data.database import create_db
 
+# Constructors
 login_manager = LoginManager()
 
 
-def create_db(engine, drop_first=True):
-    """
-    Creates tables if the engine has the privilege to do so
-
-    :param engine:
-    :param drop_first:
-    :return:
-    """
-    if drop_first:
-        engine.metadata.drop_all(engine.get_engine())
-    engine.metadata.create_all(engine.get_engine())
-    pass
-
-
+# App Initializer
 def init_app():
     """
     Initialize the core application.
@@ -36,12 +28,19 @@ def init_app():
 
     with app.app_context():
         # Register Blueprints
+
+        # # Setup Flask-User and specify the User data-model
+        # user_manager = UserManager(app, db, User)
+
         # Create Database Models
-        create_db(engine=db, drop_first=False)
+        # create_db(engine=db, drop_first=True)
+        # Create all database tables
+        db.drop_all()
+        db.create_all()
         # Create roles
         # TODO: FIX, the roles are not accepted by SupaBase, only by a local postgres
         # init_serverside_roles(session=db.session, drop_first=False)
         # Insert Dummy Data
-        # insert_dummy_data(db)
+        # insert_dummy_data(db, drop_first=True)
 
     return app
