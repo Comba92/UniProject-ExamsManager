@@ -19,8 +19,8 @@ db = SQLAlchemy()
 # Student <<-- Reserves -->> Sitting
 reserves = db.Table(
     'reserves', db.metadata,
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('sitting_id', db.Integer, db.ForeignKey('sitting.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('sitting_id', db.Integer, db.ForeignKey('sitting.id', ondelete='CASCADE'), primary_key=True),
     db.Column('date_reserved', db.DateTime, nullable=False, default=datetime.datetime.utcnow()),
     comment='Association Table for students\' reservations. When a sitting has been published, '
             'then students can reserve a spot. Users cannot reserve sittings when they already '
@@ -31,33 +31,33 @@ reserves = db.Table(
 # Program <<-- Includes -->> Course
 includes = db.Table(
     'includes', db.metadata,
-    db.Column('program_id', db.Integer, db.ForeignKey('program.id'), primary_key=True),
-    db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    db.Column('program_id', db.Integer, db.ForeignKey('program.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('course_id', db.Integer, db.ForeignKey('course.id', ondelete='CASCADE'), primary_key=True),
     comment='Association Table for the courses belonging to a program. '
-            'A course might be included in multiple programs, and programs have many courses.')
+            'A course might be included in multiple board, and board have many courses.')
 
 # Student <<-- Follows -->> Course
 follows = db.Table(
     'follows', db.metadata,
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('course_id', db.Integer, db.ForeignKey('course.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('course_id', db.Integer, db.ForeignKey('course.id', ondelete='CASCADE'), primary_key=True),
     db.Column('final_grade', db.Integer, nullable=True),
     db.Column('registry_date', db.DateTime, nullable=True),
     comment='Association Table for the courses followed by the students. '
             'The student may follow different course (even courses '
-            'that are not strictly related to the programs they follow) '
+            'that are not strictly related to the board they follow) '
             'and if they pass the course, their final grade is memorized '
             'when the conditions for final evaluation are met (valid, not expired...)')
 
 # Student <<-- Subscribes -->> Program
 subscribes = db.Table(
     'subscribes', db.metadata,
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('program_id', db.Integer, db.ForeignKey('program.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('program_id', db.Integer, db.ForeignKey('program.id', ondelete='CASCADE'), primary_key=True),
     db.Column('final_grade', db.Integer, nullable=True),
     db.Column('registry_date', db.DateTime, nullable=True),
-    comment='Association Table for the students\' programs. '
-            'A student may be subscribed to multiple programs as long as'
+    comment='Association Table for the students\' board. '
+            'A student may be subscribed to multiple board as long as'
             'only one program has no final grade and no registry date. '
             'When a student graduates, the final grade is registered.')
 
@@ -69,6 +69,7 @@ user_roles = db.Table(
 
 
 # Tables -------------------------------------------------------------------
+
 
 class Role(db.Model):
     """
@@ -88,21 +89,21 @@ class Role(db.Model):
                             secondary=user_roles,
                             back_populates='roles')
 
-    def __init__(self):
+    def __init__(self, data):
         # TODO: define the permissions for later usage on routes @roles_required
         # https://flask-user.readthedocs.io/en/latest/authorization.html
-        roles = ["LOGIN", "BOOK", "ASSESSMENT"]
+        self.name = data.get('name')
         pass
 
     def __repr__(self):
-        pass
-
-    def to_dict(self) -> dict:
-        data = {
-            'id': self.id,
-            'name': self.name
-        }
-        return data
+        return f'<Role: {self.name}>'
+    #
+    # def to_dict(self) -> dict:
+    #     data = {
+    #         'id': self.id,
+    #         'name': self.name
+    #     }
+    #     return data
 
     pass
 
@@ -123,10 +124,10 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String, nullable=False)
     first_name = db.Column(db.String(128), nullable=False, default="Unknown")
     last_name = db.Column(db.String(128), nullable=False, default="Unknown")
-    birth_day = db.Column(db.DateTime, nullable=False)
-    birth_address = db.Column(db.String, nullable=False)
-    social_security_number = db.Column(db.String(128), nullable=False)
-    address = db.Column(db.String, nullable=False)
+    # birth_day = db.Column(db.DateTime, nullable=False)
+    # birth_address = db.Column(db.String, nullable=False)
+    # social_security_number = db.Column(db.String(128), nullable=False)
+    # address = db.Column(db.String, nullable=False)
     member_since = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
     last_update = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
     last_login = db.Column(db.DateTime, index=False, nullable=False, default=datetime.datetime.utcnow())
@@ -158,16 +159,16 @@ class User(db.Model, UserMixin):
                             back_populates='users')
 
     def __init__(self, data):
-        self.role = data.get('role')
+        # self.role = data.get('role')
         self.email = data.get('email')
         self.password_hash = data.get('password_hash')
         self.first_name = data.get('first_name')
         self.last_name = data.get('last_name')
-        self.birth_day = data.get('birth_day')
-        self.birth_address = data.get('birth_address')
-        self.social_security_number = data.get('ssn')
-        self.address = data.get('address')
-        self.phone_number = data.get('phone_number')
+        # self.birth_day = data.get('birth_day')
+        # self.birth_address = data.get('birth_address')
+        # self.social_security_number = data.get('ssn')
+        # self.address = data.get('address')
+        # self.phone_number = data.get('phone_number')
         self.member_since = datetime.datetime.utcnow()
         self.last_update = datetime.datetime.utcnow()
         self.last_login = datetime.datetime.utcnow()
@@ -177,137 +178,35 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f'<User: {self.email}>'
 
-    @staticmethod
-    def load(user_id):
-        return None
+    # @staticmethod
+    # def load(user_id):
+    #     return None
 
-    def set_password_hash(self, password):
-        pass
-
-    # @login_manager.user_loader
-    # def load_user(user_id):
-    #     return User.get(user_id)
-
-    # Data Validation
-
-    # Ping
-
-    # isAnonymous
-    def is_anonymous(self):
-        return False
-
-    # isAuthenticated
-    def is_authenticated(self):
-        pass
-
-    # isActive
-    def is_active(self):
-        pass
-
-    # Register
-
-    # Login
-
-    # Logout
-
-    def to_dict(self) -> dict:
-        """
-        Returns dictionary with user's information
-
-        :return: dictionary
-        """
-        data = {
-            'role': self.role,
-            'email': self.email,
-            'password_hash': self.password_hash,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'birth_day': self.birth_day,
-            'birth_address': self.birth_address,
-            'address': self.address,
-            'ssn': self.social_security_number,
-            'phone_number': self.phone_number,
-            'member_since': self.member_since,
-            'last_update': self.last_update,
-            'last_login': self.last_login,
-            'last_logout': self.last_logout,
-        }
-        return data
+    # def to_dict(self) -> dict:
+    #     """
+    #     Returns dictionary with user's information
+    #
+    #     :return: dictionary
+    #     """
+    #     data = {
+    #         'email': self.email,
+    #         'password_hash': self.password_hash,
+    #         'first_name': self.first_name,
+    #         'last_name': self.last_name,
+    #         'birth_day': self.birth_day,
+    #         'birth_address': self.birth_address,
+    #         'address': self.address,
+    #         'ssn': self.social_security_number,
+    #         'phone_number': self.phone_number,
+    #         'member_since': self.member_since,
+    #         'last_update': self.last_update,
+    #         'last_login': self.last_login,
+    #         'last_logout': self.last_logout,
+    #     }
+    #     return data
 
     def get_id(self) -> int:
         return self.id
-
-    # Board  ------------------------------
-
-    # Create Program
-    def create_program(self, data):
-        if self.role == 'Board':
-            new_program = Program(data)
-        pass
-
-    # Remove Program
-    def remove_program(self, program_id):
-        pass
-
-    # Add Course To Program
-    def add_course_to_program(self, program_id, course_id):
-        pass
-
-    # Remove Course From Program
-    def remove_course_to_program(self, program_id, course_id):
-        pass
-
-    # Create Course
-    def create_course(self, data):
-        pass
-
-    # Remove Course
-    def remove_course(self, course_id):
-        pass
-
-    # Assign Course to Professor
-    def assign_course_prof(self, course_id, professor_id):
-        pass
-
-    # Remove Course from Professor
-    def remove_course_prof(self, course_id, professor_id):
-        pass
-
-    # Professor ---------------------------
-
-    # Student -----------------------------
-
-    # Subscribe to Program
-    def subscribe(self, program_id):
-        pass
-
-    # Unsubscribe from Program
-    def unsubscribe(self, program_id):
-        pass
-
-    # Follow Course (unless in the program)
-    def follow(self, course_id):
-        pass
-
-    # Unfollow Course (unless in the program)
-    def unfollow(self, course_id):
-        pass
-
-    # Add Booking
-    def book(self, sitting_id):
-        pass
-
-    # Remove Booking
-    def undo_booking(self, sitting_id):
-        pass
-
-    # Accept Assessment
-    def accept(self, assessment_id):
-        pass
-
-    # Refuse Assessment
-    def refuse(self, assessment_id):
-        pass
 
     pass
 
@@ -320,7 +219,7 @@ class Program(db.Model):
     academic year. It has a total number of credits to obtain, in order to graduate
     and a time span. The board creates/modifies the program by including courses and
     assigning professors to them. The program can be followed by students. Students
-    can follow different programs if they graduated from the previous ones.
+    can follow different board if they graduated from the previous ones.
 
     """
 
@@ -364,9 +263,9 @@ class Program(db.Model):
                 'end': self.end}
         return data
 
-    @staticmethod
-    def load(program_id):
-        return db.select(Program).filter_by(id=program_id)
+    # @staticmethod
+    # def load(program_id):
+    #     return db.select(Program).filter_by(id=program_id)
 
     pass
 
@@ -422,20 +321,20 @@ class Course(db.Model):
         self.module = int(data.get('module'))
         pass
 
-    def __repr__(self):
-        return f'<Course: {self.name}>'
-
-    def to_dict(self) -> dict:
-        data = {'id': self.id,
-                'name': self.name,
-                'credits': self.credits,
-                'semester': self.semester,
-                'module': self.module}
-        return data
-
-    @staticmethod
-    def load(self):
-        pass
+    # def __repr__(self):
+    #     return f'<Course: {self.name}>'
+    #
+    # def to_dict(self) -> dict:
+    #     data = {'id': self.id,
+    #             'name': self.name,
+    #             'credits': self.credits,
+    #             'semester': self.semester,
+    #             'module': self.module}
+    #     return data
+    #
+    # @staticmethod
+    # def load(self):
+    #     pass
 
     pass
 
@@ -608,26 +507,26 @@ class Assessment(db.Model):
             self.valid = True
         pass
 
-    @staticmethod
-    def load(assessment_id):
-        return db.session.select(Assessment).filter_by(Assessment.id == assessment_id)
-
-    def to_dict(self):
-        data = {
-            'id': self.id,
-            'grade': self.grade,
-            'valid': self.valid,
-            'evaluation_date': self.evaluation_date,
-            'expiry_acceptance_date': self.expiry_acceptance_date,
-            'accepted': self.accepted,
-            'acceptance_date': self.acceptance_date,
-            'sitting_id': self.sitting_id,
-            'student_id': self.student_id
-        }
-        return data
-
-    def __repr__(self):
-        return f'<Assessment: {self.id}>'
+    # @staticmethod
+    # def load(assessment_id):
+    #     return db.session.select(Assessment).filter_by(Assessment.id == assessment_id)
+    #
+    # def to_dict(self):
+    #     data = {
+    #         'id': self.id,
+    #         'grade': self.grade,
+    #         'valid': self.valid,
+    #         'evaluation_date': self.evaluation_date,
+    #         'expiry_acceptance_date': self.expiry_acceptance_date,
+    #         'accepted': self.accepted,
+    #         'acceptance_date': self.acceptance_date,
+    #         'sitting_id': self.sitting_id,
+    #         'student_id': self.student_id
+    #     }
+    #     return data
+    #
+    # def __repr__(self):
+    #     return f'<Assessment: {self.id}>'
 
     # Assessment is created by professor, it refers to a sitting and a student
     # Assessment is updated by student, they can accept/refuse

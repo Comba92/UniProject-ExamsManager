@@ -1,0 +1,71 @@
+hmtl{
+  background-image: linear-gradient(-45deg, #FFC796 0%, #FF6B95 100%);
+  width: 100%;
+  height: 100%;
+  font-family: 'Lato', sans-serif;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.card {
+  display: block;
+  position: relative;
+  width: 480px;
+  max-width: 90%;
+  min-height: 12em;
+  background: #1B1F3B;
+  color: #ffffff;
+  padding: 1em 2em 2em;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.card h1 { font-family: 'Dosis', sans-serif; font-weight: 400; font-size: 3rem; }
+
+.card form {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+}
+
+.card form input {
+  display: flex;
+  width: 80%;
+}
+
+.card form input.email {
+  border: 0px;
+  margin-bottom: 1em;
+  padding: .3em 1em;
+  text-align: center;
+  font-family: monospace;
+  font-size: 24px;
+  line-height: 30px;
+  outline: none !important;
+  border-radius: 5px;
+  background-color: #F1FFFA;
+}
+
+.card form button {
+  border: 0px transparent;
+  padding: 1em 1.2em;
+  border-radius: 5px;
+  background-color: #EE6055;
+  color: #1B1F3B;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 18px;
+  letter-spacing: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: .4s all ease-in-out;
+  cursor: pointer;
+}
+
+.card form button:hover { background-color: #F17C73; }

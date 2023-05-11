@@ -22,4 +22,4 @@
 # student_id, email, course_id, course_name, final_grade, date_registered
 # 4) - View for all exams done
 # student_id, email, course_id, course_name, module, part, grade, valid, accepted
-# 5) - View stats for career
+# 5) - View statistics for career

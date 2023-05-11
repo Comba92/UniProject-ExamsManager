@@ -162,9 +162,10 @@ class Config:
     SSL_CONTEXT = 'adhoc'
 
     # Flask-Assets
-    LESS_BIN = environ.get('LESS_BIN')
-    ASSETS_DEBUG = environ.get('ASSETS_DEBUG')
-    LESS_RUN_IN_DEBUG = environ.get('LESS_RUN_IN_DEBUG')
+    LESS_BIN = "C:/Users/PayThePizzo/node_modules/less/bin/lessc"
+    ASSETS_DEBUG = False
+    ASSETS_AUTO_BUILD = True
+    # LESS_RUN_IN_DEBUG = environ.get('LESS_RUN_IN_DEBUG')
 
     # Static Assets
     STATIC_FOLDER = 'static'

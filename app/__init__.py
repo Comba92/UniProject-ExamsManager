@@ -9,10 +9,13 @@ from flask_login import LoginManager
 from data.database import create_db
 
 # Constructors
-login_manager = LoginManager()
+# login_manager = LoginManager()
 
 
 # App Initializer
+from data.startup import insert_dummy_data
+
+
 def init_app():
     """
     Initialize the core application.
@@ -24,23 +27,34 @@ def init_app():
 
     # Initialize Plugins
     db.init_app(app)
-    login_manager.init_app(app)
+    # login_manager.init_app(app)
 
     with app.app_context():
-        # Register Blueprints
 
-        # # Setup Flask-User and specify the User data-model
+        # Register Blueprints
+        # from .blueprints.welcome.routes import welcome_bp
+        # from .blueprints.auth.routes import auth_bp
+
+        # app.register_blueprint(welcome_bp)
+        # app.register_blueprint(auth_bp)
+
+        # Compile Assets
+        # compile_assets(assets)
+
+        # Setup Flask-User and specify the User data-model
         # user_manager = UserManager(app, db, User)
 
         # Create Database Models
         # create_db(engine=db, drop_first=True)
+
         # Create all database tables
-        db.drop_all()
-        db.create_all()
-        # Create roles
-        # TODO: FIX, the roles are not accepted by SupaBase, only by a local postgres
+        # db.drop_all()
+        # db.create_all()
+
+        # Create roles TODO: FIX, the roles are not accepted by SupaBase, only by a local postgres
         # init_serverside_roles(session=db.session, drop_first=False)
+
         # Insert Dummy Data
-        # insert_dummy_data(db, drop_first=True)
+        insert_dummy_data(db, drop_first=True)
 
     return app
