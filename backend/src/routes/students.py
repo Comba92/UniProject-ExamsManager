@@ -2,6 +2,7 @@ from ..utils import *
 from ..models import *
 from flask import Blueprint, request
 from sqlalchemy import func
+from .courses import getCourses
 
 bp = Blueprint('students', __name__, url_prefix='/students')
 
@@ -10,22 +11,39 @@ def getStudents():
   res = db.session.query(Students)
   return simpleQueryToList(res)
 
+
 @bp.get("/<int:student>/")
 def getStudentData(student):
   res = db.session.query(Students).filter_by(idStudent=student).one()
   return res.to_dict
 
 
-@bp.get("/<int:student>/courses/")
+@bp.get("/<int:student>/subscribed/")
 def getSubscribedCourses(student):
   res = db.session.execute(
-    db.select(Courses)
-      .join(Subscriptions)
+    db.select(Courses, Subscriptions)
       .join(Students)
       .where(Students.idStudent == student)
   ).all()
 
   return complexQueryToList(res)
+
+
+@bp.get("/<int:student>/courses/")
+def getAllCourses(student):
+  courses = getCourses()
+  subscribed = getSubscribedCourses(student)
+  return [item for item in courses if item not in subscribed]
+
+@bp.post("/<int:student>/subscribe")
+def subscribeFromCourse(student):
+  req = request.get_json()
+
+  subscription = Subscriptions(idStudent=student, idCourse=req['idCourse'])
+
+  db.session.add(subscription)
+  db.session.commit()
+  return {"status": "success"}
 
 
 @bp.post("/<int:student>/unsubscribe")
@@ -44,6 +62,43 @@ def unsubscribeFromCourse(student):
       .where(Subscriptions.idCourse.in_(isSubscribedTo))
   )
 
+  db.session.commit()
+  return {"status": "success"}
+
+
+@bp.get("/<int:student>/exams/")
+def getSubscribedExams(student):
+  res = db.session.execute(
+      db.select(Exams)
+      .join(Courses)
+      .join(Subscriptions)
+      .join(Students)
+      .where(Students.idStudent == student)
+      .where(Exams.idExam.not_in(
+        db.select(Reservations.idExam)
+        .where(Reservations.idStudent == student)
+      ))
+  ).all()
+
+  return complexQueryToList(res)
+
+
+@bp.get("/<int:student>/reserved/")
+def reservedExams(student):
+  res = db.session.execute(
+      db.select(Reservations)
+      .where(Reservations.idStudent == student)
+  ).all()
+
+  return complexQueryToList(res)
+
+@bp.post("/<int:student>/reserve")
+def reserveExam(student):
+  req = request.get_json()
+
+  reservation = Reservations(idStudent=student, idExam=req['idExam'])
+
+  db.session.add(reservation)
   db.session.commit()
   return {"status": "success"}
 

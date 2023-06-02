@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import EntryView from "./EntryView"
 
-export default function ResultsView({ list, view, setView }) {
+export default function ResultsView({ list, view, setView }) {  
   return (
     <div>
       <h1>{view.title}</h1>

@@ -6,8 +6,8 @@ export default function StudentsArea({ user, logout }) {
   const [currentView, setView] = useState(null)
   const views = [
     {
-      title: "Iscrizione Corsi",
-      route: `/students/${user.idStudent}/courses`,
+      title: "Corsi a cui sei iscritto",
+      route: `/students/${user.idStudent}/subscribed`,
       actions: [
         {
           title: 'discriviti',
@@ -15,6 +15,51 @@ export default function StudentsArea({ user, logout }) {
             try {
               await client.post(`/students/${user.idStudent}/unsubscribe`, {
                 idCourse: entry.idCourse
+              })
+            } catch (e) { console.log(e) }
+          }}
+      ]
+    },
+    {
+      title: "Iscrizione Corsi",
+      route: `/students/${user.idStudent}/courses`,
+      actions: [
+        {
+          title: 'iscriviti',
+          execute: async (entry) => {
+            try {
+              await client.post(`/students/${user.idStudent}/subscribe`, {
+                idCourse: entry.idCourse
+              })
+            } catch (e) { console.log(e) }
+          }}
+      ]
+    },
+        {
+      title: "Appelli a cui sei iscritto",
+      route: `/students/${user.idStudent}/reserved`,
+      actions: [
+        {
+          title: 'discriviti',
+          execute: async (entry) => {
+            try {
+              await client.post(`/students/${user.idStudent}/unreserve`, {
+                idExam: entry.idExam
+              })
+            } catch (e) { console.log(e) }
+          }}
+      ]
+    },
+    {
+      title: "Iscrizione Appelli",
+      route: `/students/${user.idStudent}/exams`,
+      actions: [
+        {
+          title: 'iscriviti',
+          execute: async (entry) => {
+            try {
+              await client.post(`/students/${user.idStudent}/reserve`, {
+                idExam: entry.idExam
               })
             } catch (e) { console.log(e) }
           }}

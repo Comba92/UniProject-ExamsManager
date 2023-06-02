@@ -22,3 +22,11 @@ Content-Type: application/json
 {
   "idStudent": "88001"
 }
+
+###
+POST http://localhost:5000/students/88001/reserve
+Content-Type: application/json
+
+{
+  "idExam": "1"
+}
