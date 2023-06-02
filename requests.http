@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:5000/students/1/unsubscribe
+DELETE http://localhost:5000/students/88001/unsubscribe
 Content-Type: application/json
 
 {
@@ -20,5 +20,5 @@ POST http://localhost:5000/courses/1/subscribe
 Content-Type: application/json
 
 {
-  "idStudent": 3
+  "idStudent": "88001"
 }

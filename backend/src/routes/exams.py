@@ -7,7 +7,7 @@ bp = Blueprint('exams', __name__, url_prefix='/exams')
 @bp.get("/")
 def getExams():
   res = db.session.query(Exams)
-  return {"query": simpleQueryToList(res)}
+  return simpleQueryToList(res)
 
 
 @bp.post("/<int:exam>/reserve")
@@ -23,13 +23,13 @@ def reserveExam(exam):
   return {"stats": "success"}
 
 
-@bp.get("/<int:appello>/accepted")
+@bp.get("/<int:exam>/passed")
 def getPassedStudents(exam):
   res = db.session.execute(
     db.select(Students)
       .join(Sittings)
       .join(Exams)
-      .where(Exams.idExam==exam, Sittings.accepted)
+      .where(Exams.idExam==exam, Sittings.passed)
   ).all()
 
-  return {"query": complexQueryToList(res)}
+  return complexQueryToList(res)

@@ -43,6 +43,7 @@ def old_login():
 @bp.post('/login')
 def login():
   req = request.get_json()
+  print(req)
 
   if req['type'] == 'STUDENT':
     userToLogin = db.one_or_404(
@@ -50,11 +51,13 @@ def login():
           .join(Students)
           .where(Users.username==req['username'])
     )
-    return getStudentData(userToLogin.idUser)
+    return getStudentData(userToLogin.username)
+  
   elif req['type'] == 'TEACHER':
     userToLogin = db.one_or_404(
         db.select(Users)
           .join(Teachers)
           .where(Users.username==req['username'])
     )
-    return getTeacherData(userToLogin.idUser)
+    return getTeacherData(userToLogin.username)
+

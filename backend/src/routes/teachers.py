@@ -7,13 +7,13 @@ bp = Blueprint('teachers', __name__, url_prefix='/teachers')
 @bp.get("/")
 def getTeachers():
   res = db.session.query(Teachers)
-  return {"query": simpleQueryToList(res)}
+  return simpleQueryToList(res)
 
 
 @bp.get("/<int:teacher>/")
 def getTeacherData(teacher):
   res = db.session.query(Teachers).filter_by(idTeacher=teacher).one()
-  return {"query": res.to_dict}
+  return res.to_dict
 
 
 @bp.get("/<int:teacher>/courses/")
@@ -24,20 +24,19 @@ def getTeachedCourses(teacher):
       .where(Teachers.idTeacher == teacher)
   ).all()
 
-  return {"query": complexQueryToList(res)}
+  return complexQueryToList(res)
 
 
 @bp.get("/<int:teacher>/exams/")
 def getCoursesExams(teacher):
   res = db.session.execute(
       db.select(Exams)
-      .join(Tests)
       .join(Courses)
       .join(Teachers)
       .where(Teachers.idTeacher == teacher)
   ).all()
 
-  return {"query": complexQueryToList(res)}
+  return complexQueryToList(res)
 
 
 @bp.get("/<int:teacher>/exams/<int:exam>/students")
@@ -46,13 +45,12 @@ def getCoursesExamStudents(teacher, exam):
     db.select(Students)
       .join(Sittings)
       .join(Exams)
-      .join(Tests)
       .join(Courses)
       .join(Teachers)
       .where(Teachers.idTeacher == teacher, Exams.idExam == exam)
   ).all()
 
-  return {"query": complexQueryToList(res)}
+  return complexQueryToList(res)
 
 
 @bp.post("/<int:teacher>/createExam/")
@@ -74,7 +72,6 @@ def assignMark(teacher):
   sitting = db.session.execute(
     db.select(Sittings)
       .join(Exams)
-      .join(Tests)
       .join(Courses)
       .where(Teachers.idTeacher == teacher, Sittings.idStudent==req['idSitting'])
   ).one()

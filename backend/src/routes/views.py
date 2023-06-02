@@ -12,11 +12,11 @@ def hello_world():
 @bp.route("/sittings/")
 def getAllSittings():
   res = db.session.query(Sittings)
-  return {"query": simpleQueryToList(res)}
+  return simpleQueryToList(res)
 
 
-@bp.route("/utenti/")
+@bp.route("/users/")
 def getUtenti():
   res = db.session.query(Users)
-  return {"query": simpleQueryToList(res)}
+  return simpleQueryToList(res)
 

@@ -8,17 +8,17 @@ bp = Blueprint('courses', __name__, url_prefix='/courses')
 @bp.get("/")
 def getCourses():
   res = db.session.query(Courses)
-  return {"query": simpleQueryToList(res)}
+  return simpleQueryToList(res)
 
 
-@bp.get("/<int:course>/tests")
+@bp.get("/<int:course>/exams")
 def getCourseTests(course):
   res = db.session.execute(
-    db.select(Tests)
+    db.select(Exams)
       .join(Courses)
       .where(Courses.idCourse==course)
   )
-  return {"query": complexQueryToList(res)}
+  return complexQueryToList(res)
 
 
 @bp.post("/<int:course>/subscribe")
@@ -51,10 +51,9 @@ def getStudentiPromossi(course):
     db.select(Students)
       .join(Sittings)
       .join(Exams)
-      .join(Tests)
-      .where(Sittings.accepted==True)
-      .group_by(Students.idStudent, Tests.idExamPath)
-      .having(func.sum(Sittings.mark * (Tests.weight / 100)) >= 100)
+      .where(Sittings.passed==True)
+      .group_by(Students.idStudent, Exams.idExamPath)
+      .having(func.sum(Sittings.mark * (Exams.weight / 100)) >= 100)
   ).all()
 
-  return {"query": complexQueryToList(res)}
+  return complexQueryToList(res)
