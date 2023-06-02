@@ -1,12 +1,24 @@
 import ViewButton from "./ViewButton";
-import { useState } from "react"
-import { API_URL } from "../config";
+import { useState, useEffect } from "react"
+import {client} from '../config'
+
 
 export default function StudentsArea({ user, logout }) {
   const [currentView, setView] = useState(null)
-  const views = []
+  const views = [
+    {
+      title: 'Visualizza Corsi',
+      route: `/teachers/${user.idTeacher}/courses`,
+      actions: []
+    },
+    {
+      title: 'Visualliza Appelli',
+      route: `/teachers/${user.idTeacher}/exams`,
+      actions: []
+    },
+  ]
 
-  function resetSession() {
+function resetSession() {
     window.localStorage.removeItem("loggedUser")
     logout()
   }
@@ -16,10 +28,9 @@ export default function StudentsArea({ user, logout }) {
       <h1>Benvenuto nell'area personale, {user.name}!</h1>
       <p><button onClick={resetSession}>Logout</button></p>
       {
-        views.map(v =>
-          <ViewButton
-            title={v.title} APIRoute={v.route}
-            actions={v.actions} setView={setView}
+        views.map(v => 
+          <ViewButton 
+            view={v} setView={setView}
           />
         )
       }

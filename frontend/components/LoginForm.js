@@ -18,7 +18,7 @@ export default function LoginForm({ login }) {
         type: formData.get("type")
       })
       // login returns just one result 
-      const user = await req.data.query
+      const user = await req.data
       user.type = formData.get("type")
       
       login(user)

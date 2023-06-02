@@ -16,24 +16,24 @@ def getTeacherData(teacher):
   return res.to_dict
 
 
-@bp.get("/<int:teacher>/courses/")
+@bp.get("/<int:teacher>/courses")
 def getTeachedCourses(teacher):
   res = db.session.execute(
       db.select(Courses)
       .join(Teaches)
-      .where(Teachers.idTeacher == teacher)
+      .where(Teaches.idTeacher == teacher)
   ).all()
 
   return complexQueryToList(res)
 
 
-@bp.get("/<int:teacher>/exams/")
+@bp.get("/<int:teacher>/exams")
 def getCoursesExams(teacher):
   res = db.session.execute(
       db.select(Exams)
       .join(Courses)
-      .join(Teachers)
-      .where(Teachers.idTeacher == teacher)
+      .join(Teaches)
+      .where(Teaches.idTeacher == teacher)
   ).all()
 
   return complexQueryToList(res)
@@ -46,8 +46,8 @@ def getCoursesExamStudents(teacher, exam):
       .join(Sittings)
       .join(Exams)
       .join(Courses)
-      .join(Teachers)
-      .where(Teachers.idTeacher == teacher, Exams.idExam == exam)
+      .join(Teaches)
+      .where(Teaches.idTeacher == teacher, Exams.idExam == exam)
   ).all()
 
   return complexQueryToList(res)

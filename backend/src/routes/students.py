@@ -28,7 +28,7 @@ def getSubscribedCourses(student):
   return complexQueryToList(res)
 
 
-@bp.delete("/<int:student>/unsubscribe")
+@bp.post("/<int:student>/unsubscribe")
 def unsubscribeFromCourse(student):
   req = request.get_json()
 
@@ -48,7 +48,7 @@ def unsubscribeFromCourse(student):
   return {"status": "success"}
 
 
-@bp.delete("/<int:student>/unreserve")
+@bp.post("/<int:student>/unreserve")
 def unreserverExam(student):
   req = request.get_json()
 
