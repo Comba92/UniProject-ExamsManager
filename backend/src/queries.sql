@@ -7,6 +7,9 @@ VALUES ('marco', '88001'), ('giulio', '88002'), ('andrea', '88003');
 INSERT INTO Teachers (name, idTeacher)
 VALUES ('prof', '99001');
 
+INSERT INTO TEACHES (idTeacher, idCourse)
+VALUES ('99001', 1), ('99001', 2), ('99001', 3)
+
 INSERT INTO Courses (title)
 VALUES ('informatica'), ('matematica'), ('statistica');
 

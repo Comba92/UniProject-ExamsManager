@@ -30,7 +30,7 @@ class Teachers(SerializableModel):
 
 class Courses(SerializableModel):
   idCourse = db.Column(db.Integer, primary_key=True)
-  title = db.Column(db.String, nullable=False)
+  title = db.Column(db.String, nullable=False, unique=True)
   description = db.Column(db.String)
   academicYear = db.Column(db.Integer)
 
@@ -98,3 +98,4 @@ class Sittings(SerializableModel):
   mark = db.Column(db.Integer)
   passed = db.Column(db.Boolean)
   valid = db.Column(db.Boolean)
+  CheckConstraint('mark >= 0 AND mark <=100')

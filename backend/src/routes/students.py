@@ -21,19 +21,20 @@ def getStudentData(student):
 @bp.get("/<int:student>/subscribed/")
 def getSubscribedCourses(student):
   res = db.session.execute(
-    db.select(Courses, Subscriptions)
-      .join(Students)
-      .where(Students.idStudent == student)
+    db.select(Courses)
+    .join(Subscriptions)
+    .where(Subscriptions.idStudent == student)
   ).all()
 
   return complexQueryToList(res)
 
 
 @bp.get("/<int:student>/courses/")
-def getAllCourses(student):
+def getNotSubscribedCourses(student):
   courses = getCourses()
   subscribed = getSubscribedCourses(student)
   return [item for item in courses if item not in subscribed]
+
 
 @bp.post("/<int:student>/subscribe")
 def subscribeFromCourse(student):
@@ -69,7 +70,7 @@ def unsubscribeFromCourse(student):
 @bp.get("/<int:student>/exams/")
 def getSubscribedExams(student):
   res = db.session.execute(
-      db.select(Exams)
+      db.select(Exams, Courses)
       .join(Courses)
       .join(Subscriptions)
       .join(Students)
@@ -86,7 +87,10 @@ def getSubscribedExams(student):
 @bp.get("/<int:student>/reserved/")
 def reservedExams(student):
   res = db.session.execute(
-      db.select(Reservations)
+      db.select(Reservations, Exams, Courses)
+      .select_from(Reservations)
+      .join(Exams)
+      .join(Courses)
       .where(Reservations.idStudent == student)
   ).all()
 
@@ -148,8 +152,9 @@ def getExamsHistory(student):
 @bp.get("/<int:student>/marks/")
 def getStudentMarks(student):
   res = db.session.execute(
-    db.select(Subscriptions)
+    db.select(Subscriptions, Courses)
       .join(Students)
+      .join(Courses)
       .where(Students.idStudent==student)
   ).all()
 
@@ -160,12 +165,24 @@ def getStudentMarks(student):
 @bp.get("/<int:student>/toValidate/")
 def getStudentMarksToAccept(student):
   res = db.session.execute(
-    db.select(Sittings)
-      .join(Students)
+    db.select(Courses, Subscriptions)
       .join(Exams)
-      .where(Students.idStudent==student, Sittings.valid==True)
-      .group_by(Students.idStudent, Exams.idExamPath)
+      .join(Sittings)
+      .join(Subscriptions)
+      .where(Sittings.idStudent==student, Sittings.valid==True)
+      .group_by(Courses.idCourse, Exams.idExamPath)
       .having(func.sum(Sittings.mark * (Exams.weight/100)) >= 100)
   ).all()
 
   return complexQueryToList(res)
+
+
+@bp.post("/<int:student>/validate/")
+def validateMark(student):
+  req = request.get_json()
+
+  course = db.select(Subscriptions).filter_by(idStudent=student)
+  course.finalMark = req['finalMark']
+  db.session.commit()
+
+  return {'status': 'success'}

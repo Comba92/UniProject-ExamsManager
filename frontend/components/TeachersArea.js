@@ -18,6 +18,12 @@ export default function TeachersArea({ user, logout }) {
     })
   }
   
+  const assignMark = async (formData) => {
+    await client.post(`/teachers/${user.idTeacher}/createExam/`, {
+      idCourse: formData.get("idCourse")
+    })
+  }
+  
   const views = [
     {
       title: 'Crea Corso',
@@ -47,7 +53,20 @@ export default function TeachersArea({ user, logout }) {
     },
     {
       title: 'Assegna Voti',
-      actions: []
+      route: `teachers/${user.idTeacher}/sittings`,
+      actions: [
+        {
+          title: 'assegna voto',
+          type: 'number',
+          execute: async (mark, entry) => {
+            try {
+              await client.post(`/teachers/${user.idTeacher}/assignMark`, {
+                mark: mark, idSitting: entry.idSitting
+              })
+            } catch (e) { console.log(e) }
+          }
+        }
+      ]
     },
   ]
 

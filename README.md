@@ -9,7 +9,7 @@
 # TODO
 1. Controller per certe query (studentExists, etc...)
 2. Trigger per controllo una sola prova valida per appello
-3. Trigger eliminazione prova valida dopo scadenza
+3. Trigger eliminazione prova valida dopo scadenza, SCROPRIRE COME AGGIUNGERE TRIGGER A SQLALCHEMY
 4. Le view soffrono di SQL injection. Sistemare?
 
 # Viste / Servizi

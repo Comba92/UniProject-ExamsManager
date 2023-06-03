@@ -11,6 +11,7 @@ export default function StudentsArea({ user, logout }) {
       actions: [
         {
           title: 'discriviti',
+          type: 'button',
           execute: async (entry) => {
             try {
               await client.post(`/students/${user.idStudent}/unsubscribe`, {
@@ -27,6 +28,7 @@ export default function StudentsArea({ user, logout }) {
       actions: [
         {
           title: 'iscriviti',
+          type: 'button',
           execute: async (entry) => {
             try {
               await client.post(`/students/${user.idStudent}/subscribe`, {
@@ -38,6 +40,7 @@ export default function StudentsArea({ user, logout }) {
     },
         {
       title: "Appelli a cui sei iscritto",
+      type: 'button',
       route: `/students/${user.idStudent}/reserved`,
       actions: [
         {
@@ -53,6 +56,7 @@ export default function StudentsArea({ user, logout }) {
     },
     {
       title: "Iscrizione Appelli",
+      type: 'button',
       route: `/students/${user.idStudent}/exams`,
       actions: [
         {
@@ -78,6 +82,7 @@ export default function StudentsArea({ user, logout }) {
     },
     {
       title: 'Conferma Voti Finali',
+      type: 'button',
       route: `/students/${user.idStudent}/toValidate`,
       actions: [
          {
