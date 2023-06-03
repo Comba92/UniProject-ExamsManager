@@ -7,7 +7,7 @@ export default function StudentsArea({ user, logout }) {
   const views = [
     {
       title: "Corsi a cui sei iscritto",
-      route: `/students/${user.idStudent}/subscribed`,
+      route: `/students/${user.idStudent}/marks`,
       actions: [
         {
           title: 'discriviti',
@@ -17,7 +17,8 @@ export default function StudentsArea({ user, logout }) {
                 idCourse: entry.idCourse
               })
             } catch (e) { console.log(e) }
-          }}
+          }
+        }
       ]
     },
     {
@@ -75,6 +76,21 @@ export default function StudentsArea({ user, logout }) {
       route: `/students/${user.idStudent}/history`,
       actions: []
     },
+    {
+      title: 'Conferma Voti Finali',
+      route: `/students/${user.idStudent}/toValidate`,
+      actions: [
+         {
+          title: 'accetta',
+          execute: async (entry) => {
+            try {
+              await client.post(`/students/${user.idStudent}/validate`, {
+                finalMark: entry.finalMark
+              })
+            } catch (e) { console.log(e) }
+          }}
+      ]
+    }
   ]
 
   function resetSession() {
