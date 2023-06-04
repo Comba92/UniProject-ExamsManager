@@ -68,7 +68,6 @@ class Exams(SerializableModel):
   examSequenceId = db.Column(db.Integer)
   date = db.Column(db.Date)
   expiryDate = db.Column(db.Date)
-  testNumber = db.Column(db.Integer)
   type = db.Column(db.String)
   description = db.Column(db.String)
   optional = db.Column(db.Boolean)

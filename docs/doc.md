@@ -107,6 +107,7 @@ Di seguito viene fornita una spiegazione dettagliata di ciascuna query:
 
 
 ## 7.1 Studenti
+```python
 python
 
 from ..utils import *
@@ -116,29 +117,31 @@ from sqlalchemy import func
 from .courses import getCourses
 
 bp = Blueprint('students', __name__, url_prefix='/students')
+```
 
 In queste righe iniziali vengono importati moduli e librerie necessari per il funzionamento del codice. Vengono importati i moduli utils e models dall'ambito superiore, il modulo Blueprint e request dal pacchetto flask, e func dal modulo sqlalchemy. Viene inoltre importata la funzione getCourses dal modulo courses dell'applicazione corrente. Viene creato un oggetto Blueprint denominato 'students' con il prefisso URL /students.
 
 python
 
+```python
 @bp.get("/")
 def getStudents():
   res = db.session.query(Students)
   return simpleQueryToList(res)
+```
 
 Questa è una route che gestisce una richiesta GET all'URL /students/. Quando viene effettuata una richiesta a questo endpoint, la funzione getStudents() viene chiamata. La funzione esegue una query sul database per recuperare tutti gli oggetti Students e restituisce i risultati chiamando la funzione simpleQueryToList().
 
-python
-
+```python
 @bp.get("/<int:student>/")
 def getStudentData(student):
   res = db.session.query(Students).filter_by(idStudent=student).one()
   return res.to_dict
+```
 
 Questa route gestisce una richiesta GET all'URL /students/<int:student>/. Il parametro <int:student> indica che l'URL deve includere un numero intero che sarà assegnato alla variabile student. La funzione getStudentData() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione esegue una query sul database per recuperare un singolo oggetto Students con l'id corrispondente al valore di student e restituisce il risultato chiamando il metodo to_dict() sull'oggetto restituito dalla query.
 
-python
-
+```python
 @bp.get("/<int:student>/subscribed/")
 def getSubscribedCourses(student):
   res = db.session.execute(
@@ -148,21 +151,21 @@ def getSubscribedCourses(student):
   ).all()
 
   return complexQueryToList(res)
+```
 
 Questa route gestisce una richiesta GET all'URL /students/<int:student>/subscribed/. La funzione getSubscribedCourses() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione esegue una query complessa sul database per recuperare tutti i corsi a cui lo studente con l'id corrispondente a student è iscritto. La query unisce le tabelle Courses e Subscriptions e applica una clausola where per filtrare le iscrizioni dello studente corrente. I risultati della query vengono restituiti chiamando la funzione complexQueryToList().
 
-python
-
+```python
 @bp.get("/<int:student>/courses/")
 def getNotSubscribedCourses(student):
   courses = getCourses()
   subscribed = getSubscribedCourses(student)
   return [item for item in courses if item not in subscribed]
+```
 
 Questa route gestisce una richiesta GET all'URL /students/<int:student>/courses/. La funzione getNotSubscribedCourses() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione richiama la funzione getCourses() per ottenere tutti i corsi disponibili. Successivamente, richiama la funzione getSubscribedCourses(student) per ottenere i corsi a cui lo studente è iscritto. Infine, viene restituita una lista che contiene solo i corsi non presenti nella lista subscribed.
 
-python
-
+```python
 @bp.post("/<int:student>/subscribe")
 def subscribeFromCourse(student):
   req = request.get_json()
@@ -172,6 +175,7 @@ def subscribeFromCourse(student):
   db.session.add(subscription)
   db.session.commit()
   return {"status": "success"}
+```
 
 Questa route gestisce una richiesta POST all'URL /students/<int:student>/subscribe. La funzione subscribeFromCourse() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione recupera i dati inviati nella richiesta JSON utilizzando il modulo request di Flask. Viene creato un nuovo oggetto Subscriptions con l'id dello studente corrente e l'id del corso ottenuti dai dati della richiesta. L'oggetto subscription viene quindi aggiunto alla sessione del database e viene eseguito un commit per salvare i cambiamenti nel database. Infine, viene restituito un dizionario che indica lo stato dell'operazione.
 
@@ -180,36 +184,35 @@ Le altre route seguono un approccio simile, gestendo le richieste GET o POST a d
 ## 7.2 Docenti
 Di seguito sono fornite le spiegazioni dettagliate delle query per la documentazione del progetto:
 
-python
-
+```python
 from ..utils import *
 from ..models import *
 from flask import Blueprint, request
 
 bp = Blueprint('teachers', __name__, url_prefix='/teachers')
+```
 
 In queste righe iniziali vengono importati moduli e librerie necessari per il funzionamento del codice. Vengono importati i moduli utils e models dall'ambito superiore e il modulo Blueprint e request dal pacchetto flask. Viene creato un oggetto Blueprint denominato 'teachers' con il prefisso URL /teachers.
 
-python
-
+```python
 @bp.get("/")
 def getTeachers():
   res = db.session.query(Teachers)
   return simpleQueryToList(res)
+```
 
 Questa è una route che gestisce una richiesta GET all'URL /teachers/. Quando viene effettuata una richiesta a questo endpoint, la funzione getTeachers() viene chiamata. La funzione esegue una query sul database per recuperare tutti gli oggetti Teachers e restituisce i risultati chiamando la funzione simpleQueryToList().
 
-python
-
+```python
 @bp.get("/<int:teacher>/")
 def getTeacherData(teacher):
   res = db.session.query(Teachers).filter_by(idTeacher=teacher).one()
   return res.to_dict
+```
 
 Questa route gestisce una richiesta GET all'URL /teachers/<int:teacher>/. Il parametro <int:teacher> indica che l'URL deve includere un numero intero che sarà assegnato alla variabile teacher. La funzione getTeacherData() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione esegue una query sul database per recuperare un singolo oggetto Teachers con l'id corrispondente al valore di teacher e restituisce il risultato chiamando il metodo to_dict() sull'oggetto restituito dalla query.
 
-python
-
+```python
 @bp.get("/<int:teacher>/courses")
 def getTeachedCourses(teacher):
   res = db.session.execute(
@@ -219,11 +222,11 @@ def getTeachedCourses(teacher):
   ).all()
 
   return complexQueryToList(res)
+```
 
 Questa route gestisce una richiesta GET all'URL /teachers/<int:teacher>/courses. La funzione getTeachedCourses() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione esegue una query complessa sul database per recuperare tutti i corsi insegnati dal docente con l'id corrispondente a teacher. La query unisce le tabelle Courses e Teaches e applica una clausola where per filtrare i corsi insegnati dal docente corrente. I risultati della query vengono restituiti chiamando la funzione complexQueryToList().
 
-python
-
+```python
 @bp.get("/<int:teacher>/exams")
 def getCoursesExams(teacher):
   res = db.session.execute(
@@ -234,11 +237,11 @@ def getCoursesExams(teacher):
   ).all()
 
   return complexQueryToList(res)
+```
 
 Questa route gestisce una richiesta GET all'URL /teachers/<int:teacher>/exams. La funzione getCoursesExams() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione esegue una query complessa sul database per recuperare tutti gli esami associati ai corsi insegnati dal docente con l'id corrispondente a teacher. La query unisce le tabelle Exams, Courses e Teaches e applica una clausola where per filtrare gli esami associati ai corsi insegnati dal docente corrente. I risultati della query vengono restituiti chiamando la funzione complexQueryToList().
 
-python
-
+```python
 @bp.get("/<int:teacher>/sittings")
 def getSittings(teacher):
   res = db.session.execute(
@@ -250,11 +253,11 @@ def getSittings(teacher):
   ).all()
 
   return complexQueryToList(res)
+```
 
 Questa route gestisce una richiesta GET all'URL /teachers/<int:teacher>/sittings. La funzione getSittings() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione esegue una query complessa sul database per recuperare tutte le sedute di esame associate ai corsi insegnati dal docente con l'id corrispondente a teacher. La query unisce le tabelle Sittings, Exams, Courses e Teaches e applica una clausola where per filtrare le sedute di esame associate ai corsi insegnati dal docente corrente. I risultati della query vengono restituiti chiamando la funzione complexQueryToList().
 
-python
-
+```python
 @bp.get("/<int:teacher>/exams/<int:exam>/students")
 def getCoursesExamStudents(teacher, exam):
   res = db.session.execute(
@@ -267,11 +270,11 @@ def getCoursesExamStudents(teacher, exam):
   ).all()
 
   return complexQueryToList(res)
+```
 
 Questa route gestisce una richiesta GET all'URL /teachers/<int:teacher>/exams/<int:exam>/students. I parametri <int:teacher> e <int:exam> indicano che l'URL deve includere due numeri interi che saranno assegnati alle variabili teacher e exam. La funzione getCoursesExamStudents() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione esegue una query complessa sul database per recuperare tutti gli studenti che hanno partecipato a una specifica seduta di esame (exam) associata a un corso insegnato dal docente (teacher). La query unisce le tabelle Students, Sittings, Exams, Courses e Teaches e applica clausole where per filtrare gli studenti, le sedute di esame, i corsi e i docenti corrispondenti. I risultati della query vengono restituiti chiamando la funzione complexQueryToList().
 
-python
-
+```python
 @bp.post("/<int:teacher>/createCourse/")
 def createCourse(teacher):
   req = request.get_json()
@@ -290,11 +293,11 @@ def createCourse(teacher):
   db.session.commit()
 
   return {"status": "success"}
+```
 
 Questa route gestisce una richiesta POST all'URL /teachers/<int:teacher>/createCourse/. La funzione createCourse() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione ottiene i dati inviati nella richiesta tramite request.get_json(). Viene creato un nuovo oggetto Course con il titolo fornito nella richiesta e viene aggiunto al database. Viene creata una relazione Teaches tra il nuovo corso e il docente specificato da teacher e la relazione viene anche aggiunta al database. Infine, viene restituito un messaggio di conferma di successo.
 
-python
-
+```python
 @bp.post("/<int:teacher>/createExam/")
 def createExam(teacher):
   req = request.get_json()
@@ -312,11 +315,11 @@ def createExam(teacher):
   db.session.commit()
 
   return {"status": "success"}
+```
 
 Questa route gestisce una richiesta POST all'URL /teachers/<int:teacher>/createExam/. La funzione createExam() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione ottiene i dati inviati nella richiesta tramite request.get_json(). Viene creato un nuovo oggetto Exam con l'id del corso fornito nella richiesta e viene aggiunto al database. Viene creata una relazione Organizes tra il nuovo esame e il docente specificato da teacher e la relazione viene anche aggiunta al database. Infine, viene restituito un messaggio di conferma di successo.
 
-python
-
+```python
 @bp.post("/<int:teacher>/assignMark")
 def assignMark(teacher):
   req = request.get_json()
@@ -332,14 +335,14 @@ def assignMark(teacher):
   db.session.commit()
 
   return {"status": "success"}
+```
 
 Questa route gestisce una richiesta POST all'URL /teachers/<int:teacher>/assignMark. La funzione assignMark() viene chiamata quando viene effettuata una richiesta a questo endpoint. La funzione ottiene i dati inviati nella richiesta tramite request.get_json(). Viene eseguita una query per recuperare la seduta di esame corrispondente all'id specificato nella richiesta (idSitting) e associata al docente specificato da teacher. Viene quindi aggiornato il valore mark della seduta di esame con il valore fornito nella richiesta e viene effettuato il commit delle modifiche nel database. Infine, viene restituito un messaggio di conferma di successo.
 
 ## 7.3 Login
 Questa porzione di codice gestisce una richiesta di login.
 
-python
-
+```python
 from ..utils import *
 from ..models import *
 from flask import Blueprint, request
@@ -368,6 +371,7 @@ def login():
           .where(Users.username==req['username'])
     )
     return getTeacherData(userToLogin.username)
+```
 
 La funzione login() viene chiamata quando viene effettuata una richiesta POST all'URL '/login'. La funzione inizia ottenendo i dati inviati nella richiesta tramite request.get_json(). Successivamente, viene verificato il tipo di utente richiesto ('STUDENT' o 'TEACHER') attraverso il valore di req['type'].
 
@@ -381,11 +385,37 @@ In entrambi i casi, i dati restituiti dalla funzione getStudentData() o getTeach
 # 8. Scelte progettuali
 Sono necessarie delle scelte progettuali utili per poter delineare al meglio tutte le modalità per implementare nella maniera più efficiente e pulita tutto il codice. Per questo motivo ab- biamo deciso di implementare dei vincoli, trig- ger, check su attributi, transazioni utili per le prenotazioni e ruoli nella base di dati per ge- stire le autorizzazioni degli utenti.
 
-## 8.1 Constraints
-## 8.2 Triggers
-## 8.3 Transactions
-## 8.4 Ruoli e permessi
-## 8.5 SQL Injections
+## 8.1 Triggers
+Questo trigger per il database viene chiamato "same_exam" e viene attivato dopo l'inserimento di una riga nella tabella "Sittings". Viene eseguito per ogni riga inserita nella tabella "Sittings".
+
+Il trigger è definito con la seguente struttura:
+
+CREATE TRIGGER same_exam
+AFTER INSERT ON Sittings
+FOR EACH ROW
+
+La clausola "AFTER INSERT ON Sittings" specifica che il trigger sarà attivato dopo l'inserimento di una riga nella tabella "Sittings". "FOR EACH ROW" indica che il trigger viene eseguito per ogni riga inserita.
+
+La parte successiva del trigger definisce una condizione "WHEN". La condizione verifica se esistono delle righe nella tabella "Sittings" che soddisfano determinate condizioni, utilizzando una sottoquery.
+
+La sottoquery SELECT viene utilizzata per selezionare tutte le righe dalla tabella "Sittings" con alias "s1" e "s2" tali che s1.idSitting sia diverso da s2.idSitting. Le tabelle "Exams" vengono collegate utilizzando i rispettivi idSitting. Vengono effettuati ulteriori controlli tramite le clausole WHERE.
+
+La condizione di confronto nella clausola WHERE verifica se e1.idExamPath è uguale a e2.idExamPath e se e1.examSequenceId è uguale a e2.examSequenceId.
+
+Se la condizione WHEN del trigger viene soddisfatta, viene eseguito il blocco di istruzioni definito all'interno del blocco BEGIN...END.
+
+All'interno del blocco BEGIN...END, viene eseguita un'istruzione di aggiornamento (UPDATE). La tabella "Sittings" viene aggiornata impostando il valore del campo "valid" su FALSE per le righe che soddisfano la condizione specificata.
+
+La condizione specificata nella clausola WHERE del blocco di aggiornamento verifica se l'idSitting è presente nella sottoquery SELECT.
+
+La sottoquery SELECT viene utilizzata per selezionare l'idSitting dalla tabella "Sittings" in cui viene eseguito un join con la tabella "Exams" utilizzando l'idExam. Viene effettuato un controllo aggiuntivo per verificare se l'idStudent è uguale a new.idStudent (il valore appena inserito) e se l'idExam è diverso da new.idExam.
+
+Viene utilizzata una sottoquery SELECT aggiuntiva per selezionare l'idExamPath dalla tabella "Exams" in base all'idExam appena inserito (new.idExam).
+
+In sintesi, questo trigger ha lo scopo di aggiornare il campo "valid" nella tabella "Sittings" impostando il valore su FALSE per le righe che condividono lo stesso idExamPath e examSequenceId, ad eccezione della riga appena inserita.
+
+## 8.2 SQL Injections
+La maggior parte delle query sono state costruite con i metodi appartenenti alla libreria SQLAlchemy, che sanitizza in automatico i parametri che gli passiamo!
 
 # 9. Frontend
 Il frontend dell'applicazione è stato sviluppato utilizzando il framework Next.js in JavaScript. Next.js è un framework React che permette di creare applicazioni web con rendering lato server (Server-side Rendering) e generazione statica (Static Site Generation).
