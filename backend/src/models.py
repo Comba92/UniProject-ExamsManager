@@ -71,7 +71,8 @@ class Exams(SerializableModel):
   type = db.Column(db.String)
   description = db.Column(db.String)
   optional = db.Column(db.Boolean)
-  weight = db.Column(db.Integer)
+  weight = db.Column(db.Integer, nullable=False)
+  CheckConstraint('weight >= 0 AND weight <= 100')
 
 
 class Organizes(SerializableModel):
@@ -97,4 +98,4 @@ class Sittings(SerializableModel):
   mark = db.Column(db.Integer)
   passed = db.Column(db.Boolean)
   valid = db.Column(db.Boolean)
-  CheckConstraint('mark >= 0 AND mark <=100')
+  CheckConstraint('mark >= 0 AND mark <= 100')

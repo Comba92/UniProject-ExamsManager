@@ -40,11 +40,11 @@ export default function StudentsArea({ user, logout }) {
     },
         {
       title: "Appelli a cui sei iscritto",
-      type: 'button',
       route: `/students/${user.idStudent}/reserved`,
       actions: [
         {
           title: 'discriviti',
+          type: 'button',
           execute: async (entry) => {
             try {
               await client.post(`/students/${user.idStudent}/unreserve`, {
@@ -56,11 +56,11 @@ export default function StudentsArea({ user, logout }) {
     },
     {
       title: "Iscrizione Appelli",
-      type: 'button',
       route: `/students/${user.idStudent}/exams`,
       actions: [
         {
           title: 'iscriviti',
+          type: 'button',
           execute: async (entry) => {
             try {
               await client.post(`/students/${user.idStudent}/reserve`, {
@@ -82,11 +82,11 @@ export default function StudentsArea({ user, logout }) {
     },
     {
       title: 'Conferma Voti Finali',
-      type: 'button',
       route: `/students/${user.idStudent}/toValidate`,
       actions: [
          {
           title: 'accetta',
+          type: 'button',
           execute: async (entry) => {
             try {
               await client.post(`/students/${user.idStudent}/validate`, {

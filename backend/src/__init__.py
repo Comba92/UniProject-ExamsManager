@@ -2,6 +2,8 @@ from flask import Flask
 from sqlalchemy import text
 from flask_cors import CORS
 
+from .mock import populate
+
 def create_app():
   app = Flask(__name__)
   CORS(app)
@@ -18,9 +20,11 @@ def create_app():
     db.drop_all()
     db.create_all()
 
-    with app.open_resource('queries.sql') as f:
+    """ with app.open_resource('queries.sql') as f:
       for query in f.read().decode('utf8').split('\r\n\r\n'):
-        db.session.execute(text(query))
+        db.session.execute(text(query)) """
+    
+    populate()
 
     db.session.commit()
     app.logger.debug('Database populated.')

@@ -21,6 +21,16 @@ def getCourseTests(course):
   return complexQueryToList(res)
 
 
+@bp.get("/<int:course>/paths")
+def getCoursePaths(course):
+  res = db.session.execute(
+      db.select(ExamPaths)
+      .join(Courses)
+      .where(Courses.idCourse == course)
+  )
+  return complexQueryToList(res)
+
+
 @bp.post("/<int:course>/subscribe")
 def subscribeToCourse(course):
   req = request.get_json()
@@ -51,9 +61,9 @@ def getStudentiPromossi(course):
     db.select(Students)
       .join(Sittings)
       .join(Exams)
-      .where(Sittings.passed==True)
+      .where(Sittings.passed == True, Sittings.valid == True, Exams.optional == False)
       .group_by(Students.idStudent, Exams.idExamPath)
-      .having(func.sum(Sittings.mark * (Exams.weight / 100)) >= 100)
+      .having(func.sum(Sittings.mark * (Exams.weight / 100)) >= 100, func.count(Sittings) == ExamPaths.testsToPass)
   ).all()
 
   return complexQueryToList(res)

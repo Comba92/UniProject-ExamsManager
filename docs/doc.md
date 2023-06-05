@@ -20,7 +20,7 @@ Il progetto è composto da un server backend, in ascolto delle richieste HTTP, e
 2. pip install pipenv
 ```
 
-#### Running
+#### Running su localhost:5000
 ```bash
 1. cd backend
 2. pipenv shell
@@ -42,7 +42,7 @@ Il progetto è composto da un server backend, in ascolto delle richieste HTTP, e
 2. npm run build
 ```
 
-#### Running (development)
+#### Running (development) su localhost:3000
 ```bash
 1. cd frontend
 2. npm run dev

@@ -169,9 +169,9 @@ def getStudentMarksToAccept(student):
       .join(Exams)
       .join(Sittings)
       .join(Subscriptions)
-      .where(Sittings.idStudent==student, Sittings.valid==True)
+      .where(Sittings.idStudent==student, Sittings.valid==True, Exams.optional==False)
       .group_by(Courses.idCourse, Exams.idExamPath)
-      .having(func.sum(Sittings.mark * (Exams.weight/100)) >= 100, func.count(Sittings) == ExamPaths.testsToPass)
+      .having(func.sum(Exams.weight) >= 100)
   ).all()
 
   return complexQueryToList(res)
