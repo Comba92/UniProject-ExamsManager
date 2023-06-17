@@ -42,28 +42,3 @@ def subscribeToCourse(course):
 
   db.session.commit()
   return {"stats": "success"}
-
-
-@bp.get("/<int:course>/passed")
-def getStudentiPromossi(course):
-  oldQuery = f"""
-      SELECT * FROM Studenti s
-      JOIN Compiti c USING(idStudente)
-      JOIN Compiti_Validi v USING(idCompito)
-      JOIN Appelli a USING(IdAppello)
-      JOIN Prove p USING(idProva)
-      WHERE idCorso = {course}
-      GROUP BY idPercorso
-      HAVING COUNT(*) >= ( SELECT DISTINCT proveDaSuperare FROM Percorsi WHERE idPercorso = p.idPercorso )
-    """
-
-  res = db.session.execute(
-    db.select(Students)
-      .join(Sittings)
-      .join(Exams)
-      .where(Sittings.passed == True, Sittings.valid == True, Exams.optional == False)
-      .group_by(Students.idStudent, Exams.idExamPath)
-      .having(func.sum(Sittings.mark * (Exams.weight / 100)) >= 100, func.count(Sittings) == ExamPaths.testsToPass)
-  ).all()
-
-  return complexQueryToList(res)

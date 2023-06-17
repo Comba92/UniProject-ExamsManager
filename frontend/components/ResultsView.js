@@ -28,9 +28,9 @@ export default function ResultsView({ list, view, setView }) {
                          const formData = new FormData(event.target)
                         await a.execute(Number(formData.get('value')), e);
                         console.log(formData.get('value'))
-                        await setView() 
+                        await setView()
                     }}>
-                      <input type="number" name="value"/>
+                      <input type={a.type} name="value"/>
                       <button type="submit">invia</button>
                     </form>
                   </div>

@@ -89,6 +89,7 @@ def createExam(teacher):
   req = request.get_json()
   newExam = Exams(
       idCourse=req['idCourse'],
+      date=req['date']
   )
   db.session.add(newExam)
   db.session.commit()

@@ -165,14 +165,16 @@ def getStudentMarks(student):
 @bp.get("/<int:student>/toValidate/")
 def getStudentMarksToAccept(student):
   res = db.session.execute(
-    db.select(Courses, Subscriptions)
+    db.select(Courses, func.sum(Sittings.mark * Exams.weight / 100).label("markToValidate"))
+      .select_from(Sittings)
       .join(Exams)
-      .join(Sittings)
-      .join(Subscriptions)
-      .where(Sittings.idStudent==student, Sittings.valid==True, Exams.optional==False)
-      .group_by(Courses.idCourse, Exams.idExamPath)
-      .having(func.sum(Exams.weight) >= 100)
-  ).all()
+      .join(ExamPaths)
+      .join(Courses)
+      .where(Sittings.valid==True, Exams.optional==False, Sittings.idStudent==student)
+      .group_by(ExamPaths.idPath)
+      .having(func.count()==ExamPaths.testsToPass)
+  )
+  # returns a list of all courses where all my markes are valid and the count is equal to the exam paths testsToPass
 
   return complexQueryToList(res)
 

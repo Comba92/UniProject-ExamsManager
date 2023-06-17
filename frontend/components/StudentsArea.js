@@ -90,7 +90,7 @@ export default function StudentsArea({ user, logout }) {
           execute: async (entry) => {
             try {
               await client.post(`/students/${user.idStudent}/validate`, {
-                finalMark: entry.finalMark
+                finalMark: entry.markToValidate
               })
             } catch (e) { console.log(e) }
           }}

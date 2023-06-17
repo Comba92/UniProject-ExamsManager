@@ -31,6 +31,7 @@ export default function LoginForm({ login }) {
   return (
     <div>
       <p>Benvenuti alla pagina di gestione degli esami.</p>
+      <p>Gli id Professori iniziano da 51</p>
       <form onSubmit={handleLogin}>
         <fieldset>
           <legend>

@@ -18,7 +18,7 @@ def populate():
 
   # Creazione di docenti
   teachers = []
-  for i in range(51, 101):
+  for i in range(51, 60):
       teachers.append(
           Teachers(idTeacher=i, name=f"Docente {i}", email=f"docente{i}@example.com"))
   db.session.add_all(teachers)
@@ -32,14 +32,14 @@ def populate():
 
   # Creazione di iscrizioni
   subscriptions = []
-  for i in range(1, 101):
+  for i in range(1, 51):
       subscriptions.append(Subscriptions(
           idStudent=i, idCourse=randint(1, 20), finalMark=randint(60, 100)))
   db.session.add_all(subscriptions)
 
   # Creazione di insegnamenti
   teaches = []
-  for i in range(1, 51):
+  for i in range(51, 60):
       teaches.append(
           Teaches(idTeacher=i, idCourse=randint(1, 20), role="Insegnante"))
   db.session.add_all(teaches)
@@ -69,7 +69,7 @@ def populate():
 
   # Creazione di prenotazioni
   reservations = []
-  for i in range(1, 101):
+  for i in range(1, 51):
       reservations.append(Reservations(idStudent=i, idExam=randint(1, 100)))
   db.session.add_all(reservations)
 

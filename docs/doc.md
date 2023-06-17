@@ -443,3 +443,25 @@ Creazione di nuovi corsi (per i professori): i professori possono creare nuovi c
 Creazione di nuovi appelli (per i professori): i professori possono creare nuovi appelli per i corsi che gestiscono. Questa funzionalità consente ai professori di pianificare gli esami per i loro corsi.
 
 Assegnazione dei voti (per i professori): i professori possono assegnare i voti alle prove degli studenti. Questa funzionalità consente ai professori di valutare le prestazioni degli studenti.
+
+React è un framework JavaScript ampiamente utilizzato per lo sviluppo di interfacce utente (UI) interattive e reattive. È stato creato da Facebook e ha guadagnato una grande popolarità grazie alla sua efficienza e alla facilità di utilizzo. Il suo approccio dichiarativo alla creazione delle UI rende il codice più facile da comprendere e mantenere.
+
+Ecco una panoramica dettagliata dei concetti chiave all'interno del framework React:
+
+    Componenti: React si basa sul concetto di componenti riutilizzabili. Un componente rappresenta una parte isolata dell'interfaccia utente, che può avere il proprio stato (state) e comportamento. I componenti possono essere composti insieme per creare interfacce complesse.
+
+    JSX: JSX (JavaScript XML) è un'estensione della sintassi di JavaScript utilizzata in React per definire la struttura delle UI. Con JSX, è possibile scrivere codice che assomiglia a un mix di HTML e JavaScript, consentendo di definire la struttura dell'interfaccia utente all'interno del codice JavaScript.
+
+    Virtual DOM: React utilizza un'astrazione chiamata Virtual DOM per migliorare le prestazioni delle applicazioni. Il Virtual DOM è una rappresentazione leggera e virtuale del DOM reale. Ogni volta che lo stato di un componente cambia, React aggiorna il Virtual DOM e lo confronta con la versione precedente per determinare quali parti dell'interfaccia utente devono essere effettivamente aggiornate nel DOM reale. Questo approccio riduce al minimo le manipolazioni dirette del DOM, rendendo l'applicazione più efficiente.
+
+    Ciclo di vita del componente: I componenti React seguono un ciclo di vita ben definito, che comprende diversi metodi che vengono chiamati in momenti specifici del ciclo di vita. Ad esempio, il metodo componentDidMount viene chiamato subito dopo che un componente viene inserito nel DOM, mentre componentWillUnmount viene chiamato prima che il componente venga rimosso dal DOM. Questi metodi consentono di eseguire azioni specifiche in determinati momenti del ciclo di vita di un componente.
+
+    State e Props: Lo stato (state) e le proprietà (props) sono due concetti fondamentali in React. Lo stato rappresenta i dati che possono cambiare all'interno di un componente e influenzare la sua rappresentazione nell'interfaccia utente. Le proprietà, invece, sono dati passati da un componente genitore a un componente figlio. Il cambio di stato o di props può causare un aggiornamento dell'interfaccia utente corrispondente.
+
+    Gestione degli eventi: React consente di gestire gli eventi utente, come i clic del mouse o le pressioni di tasti, in modo dichiarativo. È possibile associare gli eventi a specifici elementi dell'interfaccia utente e definire funzioni di callback che vengono eseguite quando si verifica l'evento.
+
+    Riutilizzo dei componenti: Grazie al concetto di componenti, React promuove il riutilizzo del codice. I componenti possono essere creati una volta e utilizzati in diverse parti dell'applicazione. Ciò rende più facile mantenere e aggiornare l'interfaccia utente in modo coerente.
+
+    Routing: Anche se React in sé non offre funzionalità di routing, è spesso utilizzato insieme a librerie come React Router per implementare la navigazione tra diverse pagine o viste all'interno di un'applicazione React.
+
+Questi sono solo alcuni dei principali concetti all'interno del framework React. React offre anche molte altre funzionalità, come la gestione degli stati globali con Redux o MobX, il testing, la rendering server-side (Next.js), e molto altro. È un ecosistema molto vasto e attivo, con una comunità di sviluppatori dedicati che contribuiscono a un'ampia gamma di librerie e strumenti per semplificare lo sviluppo di applicazioni React.

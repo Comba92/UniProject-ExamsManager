@@ -12,15 +12,9 @@ export default function TeachersArea({ user, logout }) {
     })
   }
 
-  const createExam = async (formData) => {
+  const createExam = async (idCourse, date) => {
     await client.post(`/teachers/${user.idTeacher}/createExam/`, {
-      idCourse: formData.get("idCourse")
-    })
-  }
-  
-  const assignMark = async (formData) => {
-    await client.post(`/teachers/${user.idTeacher}/createExam/`, {
-      idCourse: formData.get("idCourse")
+      idCourse, date
     })
   }
   
@@ -36,14 +30,6 @@ export default function TeachersArea({ user, logout }) {
     {
       title: 'Visualizza Corsi',
       route: `/teachers/${user.idTeacher}/courses`,
-      actions: []
-    },
-    {
-      title: 'Crea Appello',
-      input: {
-        form: ['idCourse'],
-        submit: createExam
-      },
       actions: []
     },
     {

@@ -5,6 +5,8 @@ export default function About() {
     <div>
       <Navbar />
       <p>Progetto Basi di dati 2023</p>
+      <p>Ivan Spinello</p>
+      <p>Florian Sabani</p>
     </div>
   )
 }
